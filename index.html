@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鸿蒙智行定制化数据分析工具</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:#f0f4f8;color:#333;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#fff;padding:24px 0;text-align:center}
+.header h1{font-size:24px;font-weight:700;letter-spacing:2px}
+.header .sub{font-size:12px;opacity:0.7;margin-top:6px;letter-spacing:1px}
+.container{max-width:960px;margin:0 auto;padding:20px}
+.card{background:#fff;border-radius:10px;padding:24px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.card h3{font-size:15px;color:#0f3460;margin-bottom:16px;border-left:3px solid #e94560;padding-left:10px}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.col{flex:1;min-width:180px}
+.col-third{flex:1;min-width:140px}
+label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px}
+input[type=file],input[type=date],input[type=text]{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;transition:border .2s}
+input:focus{outline:none;border-color:#0f3460}
+.file-zone{border:2px dashed #ccc;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfc}
+.file-zone:hover{border-color:#0f3460;background:#f0f2f8}
+.file-zone.loaded{border-color:#548235;background:#f2f9f0}
+.file-zone .icon{font-size:28px;margin-bottom:6px}
+.file-zone .name{font-size:12px;color:#666;margin-top:4px;word-break:break-all}
+.file-zone .count{font-size:11px;color:#999}
+.btn{display:inline-block;padding:12px 32px;border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:#0f3460;color:#fff;width:100%}
+.btn-primary:hover{background:#1a1a2e}
+.btn-primary:disabled{background:#ccc;cursor:not-allowed}
+.btn-download{background:#e94560;color:#fff;width:100%;margin-top:12px}
+.btn-download:hover{background:#c23152}
+.status{padding:12px 16px;border-radius:6px;margin-top:12px;font-size:13px;display:none}
+.status.info{background:#e8f0fe;color:#0f3460;display:block}
+.status.success{background:#e2efda;color:#2d6a1e;display:block}
+.status.error{background:#fce8e6;color:#c5221f;display:block}
+.progress{margin-top:12px;background:#eee;border-radius:4px;overflow:hidden;display:none}
+.progress-bar{height:6px;background:#0f3460;width:0;transition:width .3s}
+.footer{text-align:center;padding:20px;color:#999;font-size:12px}
+.note{font-size:11px;color:#999;margin-top:4px}
+.badge{display:inline-block;background:#e94560;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>鸿蒙智行定制化数据分析工具 <span class="badge">beta v1.0</span></h1>
+  <div class="sub">上传通话记录 + 个微客户数据 + 企微客户数据，生成标准化效能分析报告</div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h3>1. 上传数据文件</h3>
+    <div class="row">
+      <div class="col-third">
+        <label>通话记录 (.xlsx)</label>
+        <div class="file-zone" id="callZone" onclick="document.getElementById('callFile').click()">
+          <div class="icon">📞</div>
+          <div>通话记录</div>
+          <div class="name" id="callName"></div>
+          <div class="count" id="callCount"></div>
+        </div>
+        <input type="file" id="callFile" accept=".xlsx" style="display:none" onchange="loadFile('call')">
+      </div>
+      <div class="col-third">
+        <label>个微客户数据 (.xlsx) <span style="color:#999;font-weight:400">选填</span></label>
+        <div class="file-zone" id="wxZone" onclick="document.getElementById('wxFile').click()">
+          <div class="icon">💬</div>
+          <div>个微客户数据</div>
+          <div class="name" id="wxName"></div>
+          <div class="count" id="wxCount"></div>
+        </div>
+        <input type="file" id="wxFile" accept=".xlsx" style="display:none" onchange="loadFile('wx')">
+      </div>
+      <div class="col-third">
+        <label>企微客户数据 (.xlsx) <span style="color:#999;font-weight:400">选填</span></label>
+        <div class="file-zone" id="qwZone" onclick="document.getElementById('qwFile').click()">
+          <div class="icon">🏢</div>
+          <div>企微客户数据</div>
+          <div class="name" id="qwName"></div>
+          <div class="count" id="qwCount"></div>
+        </div>
+        <input type="file" id="qwFile" accept=".xlsx" style="display:none" onchange="loadFile('qw')">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>2. 分析设置</h3>
+    <div class="row">
+      <div class="col">
+        <label>门店名称</label>
+        <input type="text" id="brandName" value="" placeholder="如：首钢店">
+      </div>
+      <div class="col">
+        <label>日报日期</label>
+        <input type="date" id="reportDate">
+      </div>
+    </div>
+    <div class="note" style="margin-top:8px">日报日期自动确定所在周范围(KW周号)，趋势和效能分析基于全量数据</div>
+  </div>
+
+  <div class="card">
+    <h3>3. 生成报告</h3>
+    <button class="btn btn-primary" id="genBtn" onclick="generate()" disabled>请先上传通话数据</button>
+    <div class="progress" id="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="status" id="status"></div>
+    <button class="btn btn-download" id="dlBtn" style="display:none" onclick="download()">下载分析报告 (.xlsx)</button>
+  </div>
+</div>
+<div class="footer">鸿蒙智行定制化数据分析工具 beta版 v0.1 | 纯前端处理，数据不上传服务器</div>
+
+<script>
+// ===================== 全局状态 =====================
+let callData = null, wxData = null, qwData = null, resultBlob = null;
+let callFields = {}, wxFields = {}, qwFields = {};
+
+// ===================== 字段自动识别 =====================
+const CALL_PATTERNS = {
+  callTime: ['来电时间', '呼出时间', '来电时间/呼出时间'],
+  employee: ['通话人'],
+  dept: ['通话人所属部门', '所属部门', '部门'],
+  direction: ['呼入/呼出', '呼入呼出', '方向'],
+  connStatus: ['接通状态'],
+  phone: ['手机号码', '手机号'],
+  duration: ['通话时长', '时长'],
+};
+
+const WX_PATTERNS = {
+  employee: ['员工姓名', '姓名'],
+  addTime: ['添加/上传时间', '添加时间', '上传时间'],
+  dept: ['所属部门', '部门'],
+  phone: ['客户微信手机号', '关联手机号', '手机号'],
+};
+
+const QW_PATTERNS = {
+  employee: ['工作台姓名', '员工姓名', '姓名'],
+  addTime: ['添加时间'],
+  dept: ['所属部门', '部门'],
+};
+
+function detectFields(headers, patterns) {
+  const result = {};
+  for (const [key, candidates] of Object.entries(patterns)) {
+    for (const c of candidates) {
+      for (const h of headers) {
+        const hstr = String(h).trim();
+        if (hstr.includes(c)) { result[key] = hstr; break; }
+      }
+      if (result[key]) break;
+    }
+    if (!result[key]) result[key] = null;
+  }
+  return result;
+}
+
+// ===================== 文件加载 =====================
+function loadFile(type) {
+  const input = document.getElementById(type + 'File');
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const wb = XLSX.read(e.target.result, {type:'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+    if (rows.length < 2) return showStatus('error', '文件为空或格式不正确');
+    const headers = rows[0];
+    const data = rows.slice(1).filter(r => r.some(c => c !== ''));
+    if (type === 'call') {
+      callFields = detectFields(headers, CALL_PATTERNS);
+      callData = { headers, data, fields: callFields, total: data.length };
+      document.getElementById('callName').textContent = file.name;
+      document.getElementById('callCount').textContent = `${data.length} 条 · ${headers.length} 列`;
+      document.getElementById('callZone').classList.add('loaded');
+    } else if (type === 'wx') {
+      wxFields = detectFields(headers, WX_PATTERNS);
+      wxData = { headers, data, fields: wxFields, total: data.length };
+      document.getElementById('wxName').textContent = file.name;
+      document.getElementById('wxCount').textContent = `${data.length} 条 · ${headers.length} 列`;
+      document.getElementById('wxZone').classList.add('loaded');
+    } else {
+      qwFields = detectFields(headers, QW_PATTERNS);
+      qwData = { headers, data, fields: qwFields, total: data.length };
+      document.getElementById('qwName').textContent = file.name;
+      document.getElementById('qwCount').textContent = `${data.length} 条 · ${headers.length} 列`;
+      document.getElementById('qwZone').classList.add('loaded');
+    }
+    updateGenBtn();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function updateGenBtn() {
+  const btn = document.getElementById('genBtn');
+  if (callData) { btn.disabled = false; btn.textContent = '生成分析报告'; }
+}
+
+// ===================== 工具函数 =====================
+function colIdx(fields, key, headers) {
+  const name = fields[key];
+  if (!name) return -1;
+  return headers.indexOf(name);
+}
+
+function parseDate(val) {
+  if (!val || val === '') return null;
+  if (val instanceof Date) return val;
+  const str = String(val).trim();
+  if (/^\d{5}$/.test(str)) {
+    const d = new Date((Number(str) - 25569) * 86400 * 1000);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function parseDuration(val) {
+  if (!val || val === '') return 0;
+  const str = String(val).trim();
+  const m = str.match(/(\d+)'(\d+)/);
+  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
+  const n = parseFloat(str);
+  return isNaN(n) ? 0 : n * 60;
+}
+
+function isConnected(status) {
+  if (!status) return false;
+  return String(status).includes('已接通');
+}
+
+function isOutbound(direction) {
+  if (!direction) return true; // default to outbound
+  return String(direction).includes('呼出');
+}
+
+function extractStore(dept) {
+  if (!dept) return '未分组';
+  const str = String(dept).trim();
+  const m = str.match(/（(.+?)）/);
+  if (m) return m[1];
+  return str.length > 12 ? str.slice(0, 12) + '...' : str;
+}
+
+function dateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function getMonday(d) {
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon = new Date(d);
+  mon.setDate(d.getDate() + diff);
+  return mon;
+}
+
+function getWeekNumber(d) {
+  const start = new Date(d.getFullYear(), 0, 1);
+  const days = Math.floor((d - start) / (86400000));
+  return Math.ceil((days + start.getDay() + 1) / 7);
+}
+
+// ===================== 数据处理 =====================
+function processCallData() {
+  const h = callData.headers;
+  const fields = callData.fields;
+  const ci_time = colIdx(fields, 'callTime', h);
+  const ci_emp = colIdx(fields, 'employee', h);
+  const ci_dept = colIdx(fields, 'dept', h);
+  const ci_dir = colIdx(fields, 'direction', h);
+  const ci_conn = colIdx(fields, 'connStatus', h);
+  const ci_phone = colIdx(fields, 'phone', h);
+  const ci_dur = colIdx(fields, 'duration', h);
+
+  const records = [];
+  for (const row of callData.data) {
+    const time = parseDate(row[ci_time]);
+    if (!time) continue;
+    const emp = String(row[ci_emp] || '').trim();
+    if (/^\d{11}$/.test(emp)) continue;
+    const dept = String(row[ci_dept] || '');
+    const direction = String(row[ci_dir] || '');
+    const conn = isConnected(row[ci_conn]);
+    const phone = String(row[ci_phone] || '');
+    const durSec = parseDuration(row[ci_dur]);
+    const outbound = isOutbound(direction);
+    const store = extractStore(dept);
+
+    records.push({
+      time, emp, dept, conn, phone, durSec, store, outbound,
+      date: dateStr(time),
+      hour: time.getHours(),
+      weekday: time.getDay() === 0 ? 6 : time.getDay() - 1,
+      over30s: conn && durSec >= 30,
+      over3min: conn && durSec >= 180,
+    });
+  }
+
+  // 老客/新客判断：全量首次接触（含呼入+呼出），精确到时间戳
+  // 外呼若为该号码的首次接触 → 新客；否则 → 老客跟进
+  const phoneFirstContact = {};
+  const allSorted = [...records]
+    .filter(r => r.phone && r.phone !== '--')
+    .sort((a, b) => a.time - b.time);
+  for (const r of allSorted) {
+    if (!(r.phone in phoneFirstContact)) {
+      phoneFirstContact[r.phone] = r.time.getTime(); // 存储首次接触的精确时间戳
+    }
+  }
+  for (const r of records) {
+    if (!r.outbound || !r.phone || r.phone === '--') {
+      r.isNewCustomer = false;
+      r.isReturning = false;
+      continue;
+    }
+    r.isNewCustomer = phoneFirstContact[r.phone] === r.time.getTime();
+    r.isReturning = !r.isNewCustomer;
+  }
+
+  return records;
+}
+
+function processWxData() {
+  if (!wxData) return [];
+  const h = wxData.headers;
+  const fields = wxData.fields;
+  const ci_emp = colIdx(fields, 'employee', h);
+  const ci_time = colIdx(fields, 'addTime', h);
+  const ci_dept = colIdx(fields, 'dept', h);
+  const records = [];
+  for (const row of wxData.data) {
+    const emp = String(row[ci_emp] || '').trim();
+    if (!emp) continue;
+    const time = parseDate(row[ci_time]);
+    const dept = String(row[ci_dept] || '');
+    const store = extractStore(dept);
+    records.push({ emp, store, date: time ? dateStr(time) : null, time });
+  }
+  return records;
+}
+
+function processQwData() {
+  if (!qwData) return [];
+  const h = qwData.headers;
+  const fields = qwData.fields;
+  const ci_emp = colIdx(fields, 'employee', h);
+  const ci_time = colIdx(fields, 'addTime', h);
+  const ci_dept = colIdx(fields, 'dept', h);
+  const records = [];
+  for (const row of qwData.data) {
+    const emp = String(row[ci_emp] || '').trim();
+    if (!emp) continue;
+    const time = parseDate(row[ci_time]);
+    const dept = String(row[ci_dept] || '');
+    const store = extractStore(dept);
+    records.push({ emp, store, date: time ? dateStr(time) : null, time });
+  }
+  return records;
+}
+
+// ===================== 报告生成 =====================
+async function generate() {
+  if (!callData) return;
+  const brand = document.getElementById('brandName').value.trim() || '品牌';
+  const dateVal = document.getElementById('reportDate').value;
+  if (!dateVal) return showStatus('error', '请选择日报日期');
+
+  const reportDate = new Date(dateVal + 'T00:00:00');
+  const reportDateStr = dateStr(reportDate);
+  const weekStart = getMonday(reportDate);
+  const weekEnd = new Date(reportDate);
+  const weekStartStr = dateStr(weekStart);
+  const weekEndStr = dateStr(reportDate);
+  const kw = getWeekNumber(reportDate);
+  const todayStr = dateStr(new Date());
+
+  showStatus('info', '正在处理数据...');
+  document.getElementById('progress').style.display = 'block';
+  updateProgress(8);
+
+  const callRecords = processCallData();
+  updateProgress(20);
+  const wxRecords = processWxData();
+  updateProgress(28);
+  const qwRecords = processQwData();
+  updateProgress(35);
+
+  // 统计
+  const allDates = [...new Set(callRecords.map(r => r.date))].sort();
+  const nDays = allDates.length;
+  const fullStart = allDates[0], fullEnd = allDates[allDates.length - 1];
+
+  const stores = [...new Set(callRecords.map(r => r.store))];
+  stores.sort((a,b) => callRecords.filter(r=>r.store===b).length - callRecords.filter(r=>r.store===a).length);
+  // 隐藏无外呼无加微的门店
+  const activeStoreSet = new Set([
+    ...callRecords.filter(r => r.outbound).map(r => r.store),
+    ...wxRecords.map(r => r.store),
+    ...qwRecords.map(r => r.store)
+  ]);
+  const visibleStores = stores.filter(s => activeStoreSet.has(s) && s !== '--' && s !== '未分组');
+
+  const callEmps = [...new Set(callRecords.map(r => r.emp))];
+  const wxEmps = [...new Set(wxRecords.map(r => r.emp))];
+  const qwEmps = [...new Set(qwRecords.map(r => r.emp))];
+  const allEmps = [...new Set([...callEmps, ...wxEmps, ...qwEmps])];
+  const dualEmps = callEmps.filter(e => qwEmps.includes(e));
+
+  // 日报数据
+  const dayRecords = callRecords.filter(r => r.date === reportDateStr);
+  const dayOut = dayRecords.filter(r => r.outbound);
+  const dayIn = dayRecords.filter(r => !r.outbound);
+  const dayTotal = dayRecords.length;
+  const dayOutTotal = dayOut.length;
+  const dayOutConn = dayOut.filter(r => r.conn).length;
+  const dayOutRate = dayOutTotal > 0 ? dayOutConn / dayOutTotal : 0;
+  const dayInTotal = dayIn.length;
+  const dayInConn = dayIn.filter(r => r.conn).length;
+  const dayInRate = dayInTotal > 0 ? dayInConn / dayInTotal : 0;
+  const dayOutDur = dayOut.filter(r => r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const dayTotalDur = dayRecords.filter(r => r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const dayOutOver30 = dayOut.filter(r => r.over30s).length;
+  const dayOutOver30Rate = dayOutConn > 0 ? dayOutOver30 / dayOutConn : 0;
+  const dayOutOver3min = dayOut.filter(r => r.over3min).length;
+  const dayOutAvgDur = dayOutConn > 0 ? dayOutDur / dayOutConn : 0;
+  const dayNewCust = dayOut.filter(r => r.isNewCustomer).length;
+  const dayReturnCust = dayOut.filter(r => r.isReturning).length;
+  const dayWx = wxRecords.filter(r => r.date === reportDateStr);
+  const dayWxCount = dayWx.length;
+  const dayQw = qwRecords.filter(r => r.date === reportDateStr);
+  const dayQwCount = dayQw.length;
+  const dayActive = [...new Set([...dayOut.map(r=>r.emp), ...dayWx.map(r=>r.emp), ...dayQw.map(r=>r.emp)])].length;
+  const dayStores = [...new Set([...dayOut.map(r=>r.store), ...dayWx.map(r=>r.store), ...dayQw.map(r=>r.store)])].filter(s => s !== '--' && s !== '未分组').length;
+  const dayPerCapDur = dayActive > 0 ? dayTotalDur / dayActive : 0;
+
+  // 全量
+  const totalOut = callRecords.filter(r => r.outbound).length;
+  const totalOutConn = callRecords.filter(r => r.outbound && r.conn).length;
+  const totalOutRate = totalOut > 0 ? totalOutConn / totalOut : 0;
+  const totalIn = callRecords.filter(r => !r.outbound).length;
+  const totalInConn = callRecords.filter(r => !r.outbound && r.conn).length;
+  const totalInRate = totalIn > 0 ? totalInConn / totalIn : 0;
+  const totalOutDur = callRecords.filter(r => r.outbound && r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const totalDur = callRecords.filter(r => r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const avgDaily = totalOut / nDays;
+  const totalNewCust = callRecords.filter(r => r.outbound && r.isNewCustomer).length;
+  const totalReturnCust = callRecords.filter(r => r.outbound && r.isReturning).length;
+
+  // 当周
+  const weekRecords = callRecords.filter(r => r.date >= weekStartStr && r.date <= weekEndStr);
+  const weekWx = wxRecords.filter(r => r.date && r.date >= weekStartStr && r.date <= weekEndStr);
+  const weekQw = qwRecords.filter(r => r.date && r.date >= weekStartStr && r.date <= weekEndStr);
+  const weekWxTotal = weekWx.length;
+  const weekQwTotal = weekQw.length;
+
+  updateProgress(50);
+
+  // ===================== 构建 Excel =====================
+  const ExcelJS = window.ExcelJS;
+  const wb = new ExcelJS.Workbook();
+  wb.creator = '鸿蒙智行定制化数据分析工具 beta v1.0';
+
+  const DARK_BLUE = '0f3460';
+  const ACCENT_RED = 'e94560';
+  const PALETTE = ['0f3460','16213e','533483','e94560','1a1a2e','533483','0f3460','e94560','16213e','533483'];
+  const ALT_FILL = 'F2F4F8';
+  const GOOD_FILL = 'E2EFDA';
+  const BAD_FILL = 'F4B4C2';
+
+  const hdrFill = { type:'pattern', pattern:'solid', fgColor:{argb:DARK_BLUE} };
+  const hdrFont = { name:'Microsoft YaHei', size:10, bold:true, color:{argb:'FFFFFF'} };
+  const catFill = { type:'pattern', pattern:'solid', fgColor:{argb:'16213e'} };
+  const catFont = { name:'Microsoft YaHei', size:9, bold:true, color:{argb:'FFFFFF'} };
+  const titleFont = { name:'Microsoft YaHei', size:14, bold:true, color:{argb:DARK_BLUE} };
+  const subFont = { name:'Microsoft YaHei', size:11, bold:true, color:{argb:DARK_BLUE} };
+  const bodyFont = { name:'Microsoft YaHei', size:10, color:{argb:'333333'} };
+  const smallFont = { name:'Microsoft YaHei', size:9, color:{argb:'888888'} };
+  const goldFont = { name:'Microsoft YaHei', size:11, bold:true, color:{argb:'BF8F00'} };
+  const altFill = { type:'pattern', pattern:'solid', fgColor:{argb:ALT_FILL} };
+  const goodFill = { type:'pattern', pattern:'solid', fgColor:{argb:GOOD_FILL} };
+  const badFill = { type:'pattern', pattern:'solid', fgColor:{argb:BAD_FILL} };
+  const thinBorder = { style:'thin', color:{argb:'C0C0C0'} };
+  const centerAlign = { horizontal:'center', vertical:'middle', wrapText:true };
+  const pctFmt = '0.0%';
+  const scoreFmt = '0.00';
+
+  function setHdr(rowObj, values, fill) {
+    values.forEach((v, i) => {
+      const c = rowObj.getCell(i + 1);
+      c.value = v; c.font = hdrFont; c.fill = fill || hdrFill; c.alignment = centerAlign;
+      c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+    });
+  }
+
+  function setBodyCell(cell, value, font, fill, numFmt) {
+    cell.value = value;
+    cell.font = font || bodyFont;
+    cell.alignment = centerAlign;
+    cell.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+    if (fill) cell.fill = fill;
+    if (numFmt) cell.numFmt = numFmt;
+  }
+
+  function altRow(ws, startRow, endRow, ncol) {
+    for (let r = startRow; r <= endRow; r++) {
+      if ((r - startRow) % 2 === 1) {
+        for (let c = 1; c <= ncol; c++) {
+          ws.getRow(r).getCell(c).fill = altFill;
+        }
+      }
+    }
+  }
+
+  // =================== Sheet 1: 日报报表 ===================
+  const ws1 = wb.addWorksheet('日报报表');
+  const NCOLS = 18;
+  ws1.mergeCells(1, 1, 1, NCOLS);
+  ws1.getCell('A1').value = `${brand} · 日报报表 ${reportDateStr}`;
+  ws1.getCell('A1').font = titleFont;
+  ws1.getCell('A1').alignment = centerAlign;
+
+  ws1.mergeCells(2, 1, 2, NCOLS);
+  ws1.getCell('A2').value = `生成: ${todayStr} | 统计日期: ${reportDateStr}`;
+  ws1.getCell('A2').font = smallFont;
+
+  // KPI 大数卡片 (行4-5, 10列)
+  const kpiData = [
+    {v:dayOutTotal, c:PALETTE[0], l:'当日外呼'},
+    {v:dayOutConn, c:PALETTE[1], l:'外呼接通'},
+    {v:`${(dayOutRate*100).toFixed(1)}%`, c:PALETTE[2], l:'外呼接通率'},
+    {v:`${dayTotalDur.toFixed(0)}分`, c:PALETTE[3], l:'通话时长'},
+    {v:`${dayPerCapDur.toFixed(1)}分/人`, c:PALETTE[4], l:'人均通话时长'},
+    {v:dayQwCount, c:PALETTE[5], l:'当日企微加微'},
+    {v:dayWxCount, c:PALETTE[6], l:'当日个微加微'},
+    {v:`${dayInTotal}通`, c:PALETTE[7], l:'当日呼入'},
+    {v:dayActive, c:PALETTE[8], l:'活跃员工'},
+    {v:dayStores, c:PALETTE[9], l:'活跃门店'},
+  ];
+  kpiData.forEach((k, i) => {
+    const c = ws1.getRow(4).getCell(i+1);
+    c.value = k.v; c.font = {name:'Microsoft YaHei', size:16, bold:true, color:{argb:k.c}};
+    c.alignment = centerAlign;
+  });
+  kpiData.forEach((k, i) => {
+    const c = ws1.getRow(5).getCell(i+1);
+    c.value = k.l; c.font = {name:'Microsoft YaHei', size:9, bold:true, color:{argb:'333333'}};
+    c.alignment = centerAlign;
+  });
+
+  // 分类表头 (行7)
+  // 基本信息 | 工作手机外呼情况 | 工作手机接听情况 | 微信加微 | 企微加微 | 沟通时长
+  ws1.mergeCells(7, 2, 7, 9); // 工作手机外呼情况
+  ws1.mergeCells(7, 10, 7, 12); // 工作手机接听情况
+  ws1.mergeCells(7, 13, 7, 14); // 个微加微情况
+  ws1.mergeCells(7, 15, 7, 16); // 企微加微情况
+  ws1.mergeCells(7, 17, 7, 18); // 沟通时长统计
+
+  const catHeaders = [
+    {col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:10, v:'工作手机接听情况'},
+    {col:13, v:'个微加微情况'},{col:15, v:'企微加微情况'},{col:17, v:'沟通时长统计'},
+  ];
+  catHeaders.forEach(ch => {
+    const c = ws1.getRow(7).getCell(ch.col);
+    c.value = ch.v; c.font = catFont; c.fill = catFill; c.alignment = centerAlign;
+    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  });
+  // fill remaining category header cells
+  for (let i = 1; i <= NCOLS; i++) {
+    const c = ws1.getRow(7).getCell(i);
+    if (!c.value) { c.fill = catFill; c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder }; }
+  }
+  // 基本信息 row 8
+  ws1.getRow(8).getCell(1).value = '员工'; ws1.getRow(8).getCell(1).font = hdrFont; ws1.getRow(8).getCell(1).fill = hdrFill; ws1.getRow(8).getCell(1).alignment = centerAlign; ws1.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+
+  // 列标题 (行8)
+  const detHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','个微好友','当日个微','企微好友','当日企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
+  for (let i = 1; i < detHdrs.length; i++) {
+    const c = ws1.getRow(8).getCell(i+1);
+    c.value = detHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
+    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  }
+
+  ws1.views = [{state:'frozen', ySplit:8}];
+
+  // 按门店分组
+  let row = 9;
+  let allOutAvgDurSum = 0, allOutAvgDurCount = 0;
+  visibleStores.forEach(st => {
+    const stDay = dayRecords.filter(r => r.store === st);
+    const stEmps = [...new Set(stDay.map(r => r.emp))].sort();
+
+    ws1.mergeCells(row, 1, row, NCOLS);
+    ws1.getCell(`A${row}`).value = st;
+    ws1.getCell(`A${row}`).font = subFont;
+    row++;
+
+    const rStart = row;
+    let stOut=0, stOutConn=0, stOutOver30=0, stOutDeep=0, stNew=0, stReturn=0;
+    let stIn=0, stInConn=0, stWx=0, stDayWx=0, stQw=0, stDayQw=0, stOutDur=0, stTotalDur=0;
+    let stOutAvgDurSum=0, stOutAvgDurCount=0;
+
+    stEmps.forEach(emp => {
+      const ed = stDay.filter(r => r.emp === emp);
+      const out = ed.filter(r => r.outbound);
+      const inn = ed.filter(r => !r.outbound);
+      const outCalls = out.length, outConn = out.filter(r => r.conn).length;
+      const outRate = outCalls > 0 ? outConn/outCalls : 0;
+      const outOver30 = out.filter(r => r.over30s).length;
+      const outOver30Rate = outConn > 0 ? outOver30/outConn : 0;
+      const outDeep = out.filter(r => r.over3min).length;
+      const outAvgDur = outConn > 0 ? out.filter(r=>r.conn).reduce((s,r)=>s+r.durSec,0)/60/outConn : 0;
+      if (outConn > 0) { stOutAvgDurSum += outAvgDur; stOutAvgDurCount++; }
+      const outNew = out.filter(r => r.isNewCustomer).length;
+      const outReturn = out.filter(r => r.isReturning).length;
+      const inCalls = inn.length, inConn = inn.filter(r => r.conn).length;
+      const inRate = inCalls > 0 ? inConn/inCalls : 0;
+      const outDur = out.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+      const totalDur = ed.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+      const wxc = dayWx.filter(r => r.emp === emp).length;
+      const wxcTotal = wxRecords.filter(r => r.emp === emp).length;
+      const qwc = dayQw.filter(r => r.emp === emp).length;
+      const qwcTotal = qwRecords.filter(r => r.emp === emp).length;
+
+      stOut+=outCalls; stOutConn+=outConn; stOutOver30+=outOver30; stOutDeep+=outDeep;
+      stNew+=outNew; stReturn+=outReturn; stIn+=inCalls; stInConn+=inConn;
+      stWx+=wxcTotal; stDayWx+=wxc; stQw+=qwcTotal; stDayQw+=qwc; stOutDur+=outDur; stTotalDur+=totalDur;
+
+      const vals = [emp, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
+        outDeep, inCalls, inConn, inRate, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
+      vals.forEach((v, i) => {
+        const cell = ws1.getRow(row).getCell(i+1);
+        const isPct = [5,7,11].includes(i);
+        setBodyCell(cell, isPct ? Math.round(v*1e4)/1e4 : (typeof v === 'number' ? Math.round(v*10)/10 : v), bodyFont, null, isPct ? pctFmt : null);
+      });
+      row++;
+    });
+
+    // 仅微信员工
+    const wxOnly = [...new Set([...wxEmps, ...qwEmps])].filter(e => !callEmps.includes(e));
+    wxOnly.forEach(emp => {
+      const empStore = (wxRecords.find(r=>r.emp===emp)||qwRecords.find(r=>r.emp===emp))?.store;
+      if (empStore !== st) return;
+      const wxc = dayWx.filter(r => r.emp === emp).length;
+      const wxcTotal = wxRecords.filter(r => r.emp === emp).length;
+      const qwc = dayQw.filter(r => r.emp === emp).length;
+      const qwcTotal = qwRecords.filter(r => r.emp === emp).length;
+      stWx+=wxcTotal; stDayWx+=wxc; stQw+=qwcTotal; stDayQw+=qwc;
+      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
+      vals.forEach((v, i) => {
+        const cell = ws1.getRow(row).getCell(i+1);
+        setBodyCell(cell, v, bodyFont, null, [5,7,11].includes(i)?pctFmt:null);
+      });
+      row++;
+    });
+
+    const rEnd = row - 1;
+    altRow(ws1, rStart, rEnd, NCOLS);
+
+    // 门店合计 — 平均外呼接通时长排除0值
+    const stOutRate = stOut > 0 ? stOutConn/stOut : 0;
+    const stOutOver30Rate = stOutConn > 0 ? stOutOver30/stOutConn : 0;
+    const stInRate = stIn > 0 ? stInConn/stIn : 0;
+    const stAvgDur = stOutAvgDurCount > 0 ? stOutAvgDurSum / stOutAvgDurCount : 0;
+    allOutAvgDurSum += stOutAvgDurSum; allOutAvgDurCount += stOutAvgDurCount;
+    const stVals = ['门店合计', stOut, stReturn, stNew, stOutConn, stOutRate, stOutOver30, stOutOver30Rate,
+      stOutDeep, stIn, stInConn, stInRate, stWx, stDayWx, stQw, stDayQw, stAvgDur, stTotalDur];
+    const boldFont = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
+    stVals.forEach((v, i) => {
+      const cell = ws1.getRow(row).getCell(i+1);
+      setBodyCell(cell, [5,7,11].includes(i) ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont, altFill, [5,7,11].includes(i)?pctFmt:null);
+    });
+    row += 2;
+  });
+
+  // 全店合计 — 平均外呼接通时长排除0值
+  ws1.mergeCells(row, 1, row, NCOLS);
+  ws1.getCell(`A${row}`).value = '全店合计'; ws1.getCell(`A${row}`).font = subFont;
+  row++;
+  const allAvgDur = allOutAvgDurCount > 0 ? allOutAvgDurSum / allOutAvgDurCount : 0;
+  const grandVals = ['全店', dayOutTotal, dayReturnCust, dayNewCust, dayOutConn, dayOutRate,
+    dayOutOver30, dayOutOver30Rate, dayOutOver3min, dayInTotal, dayInConn, dayInRate,
+    wxRecords.length, dayWxCount, qwRecords.length, dayQwCount, allAvgDur, dayTotalDur];
+  const boldFont2 = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
+  grandVals.forEach((v, i) => {
+    const cell = ws1.getRow(row).getCell(i+1);
+    setBodyCell(cell, [5,7,11].includes(i) ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont2, altFill, [5,7,11].includes(i)?pctFmt:null);
+  });
+
+  ws1.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
+  updateProgress(60);
+
+  // =================== Sheet 2: 日度趋势 ===================
+  const ws2 = wb.addWorksheet('工作手机日度趋势统计');
+  const NCOLS2 = 17;
+  ws2.mergeCells(1, 1, 1, NCOLS2);
+  ws2.getCell('A1').value = '工作手机日度趋势统计'; ws2.getCell('A1').font = titleFont;
+  ws2.getCell('A1').alignment = centerAlign;
+  ws2.mergeCells(2, 1, 2, NCOLS2);
+  ws2.getCell('A2').value = `全量日报汇总（${fullStart}~${fullEnd}，${nDays}天·${visibleStores.length}店）| 生成: ${todayStr}`;
+  ws2.getCell('A2').font = smallFont;
+
+  // 分类表头 (行4)
+  ws2.mergeCells(4, 1, 5, 1); // 日期
+  ws2.mergeCells(4, 2, 4, 10); // 工作手机外呼情况
+  ws2.mergeCells(4, 11, 4, 13); // 工作手机接听情况
+  ws2.mergeCells(4, 14, 4, 15); // 加微情况
+  ws2.mergeCells(4, 16, 4, 17); // 沟通时长统计
+
+  const cat2 = [
+    {col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:11, v:'工作手机接听情况'},
+    {col:14, v:'加微情况'},{col:16, v:'沟通时长统计'},
+  ];
+  cat2.forEach(ch => {
+    const c = ws2.getRow(4).getCell(ch.col);
+    c.value = ch.v; c.font = catFont; c.fill = catFill; c.alignment = centerAlign;
+    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  });
+  for (let i = 1; i <= NCOLS2; i++) {
+    const c = ws2.getRow(4).getCell(i);
+    if (!c.value) { c.fill = catFill; c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder }; }
+  }
+  ws2.getRow(5).getCell(1).value = '日期';
+  ws2.getRow(5).getCell(1).font = hdrFont; ws2.getRow(5).getCell(1).fill = hdrFill; ws2.getRow(5).getCell(1).alignment = centerAlign;
+  ws2.getRow(5).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+
+  const trendHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','平均外呼接通时长','呼入量','呼入接通量','呼入接通率','个微添数','企微添数','通话总时长','人均时长'];
+  for (let i = 1; i < trendHdrs.length; i++) {
+    const c = ws2.getRow(5).getCell(i+1);
+    c.value = trendHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
+    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  }
+
+  row = 6;
+  const r2Start = row;
+  let totalWxAdd = 0, totalQwAdd = 0;
+  let sumTotalDur = 0, sumOutAvgDur = 0, countOutAvgDur = 0, sumPerCapDur = 0, countPerCapDur = 0;
+  allDates.forEach(d => {
+    const dd = callRecords.filter(r => r.date === d);
+    const dOut = dd.filter(r => r.outbound);
+    const dIn = dd.filter(r => !r.outbound);
+    const outCalls = dOut.length;
+    const outConn = dOut.filter(r => r.conn).length;
+    const outRate = outCalls > 0 ? outConn/outCalls : 0;
+    const outOver30 = dOut.filter(r => r.over30s).length;
+    const outOver30Rate = outConn > 0 ? outOver30/outConn : 0;
+    const outDeep = dOut.filter(r => r.over3min).length;
+    const outAvgDur = outConn > 0 ? dOut.filter(r=>r.conn).reduce((s,r)=>s+r.durSec,0)/60/outConn : 0;
+    const outNew = dOut.filter(r => r.isNewCustomer).length;
+    const outReturn = dOut.filter(r => r.isReturning).length;
+    const inCalls = dIn.length;
+    const inConn = dIn.filter(r => r.conn).length;
+    const inRate = inCalls > 0 ? inConn/inCalls : 0;
+    const totalDur = dd.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+    const dayWxRecs = wxRecords.filter(r => r.date === d);
+    const dayQwRecs = qwRecords.filter(r => r.date === d);
+    const wxAdd = dayWxRecs.length;
+    const qwAdd = dayQwRecs.length;
+    const activeEmps = [...new Set([...dOut.map(r=>r.emp), ...dayWxRecs.map(r=>r.emp), ...dayQwRecs.map(r=>r.emp)])].length;
+    const perCapDur = activeEmps > 0 ? totalDur/activeEmps : 0;
+    totalWxAdd += wxAdd; totalQwAdd += qwAdd;
+    sumTotalDur += totalDur;
+    if (outAvgDur > 0) { sumOutAvgDur += outAvgDur; countOutAvgDur++; }
+    if (perCapDur > 0) { sumPerCapDur += perCapDur; countPerCapDur++; }
+
+    const vals = [d, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
+      outDeep, outAvgDur, inCalls, inConn, inRate, wxAdd, qwAdd, totalDur, perCapDur];
+    vals.forEach((v, i) => {
+      const cell = ws2.getRow(row).getCell(i+1);
+      const isPct = [5,7,12].includes(i);
+      setBodyCell(cell, isPct ? Math.round(v*1e4)/1e4 : (typeof v === 'number' ? Math.round(v*10)/10 : v), bodyFont, null, isPct ? pctFmt : null);
+    });
+    row++;
+  });
+  const r2End = row - 1;
+  altRow(ws2, r2Start, r2End, NCOLS2);
+
+  // 合计行
+  ws2.getRow(row).getCell(1).value = '合计';
+  ws2.getRow(row).getCell(1).font = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
+  const totalOutOver30Rate = totalOutConn > 0 ? callRecords.filter(r=>r.outbound&&r.over30s).length/totalOutConn : 0;
+  const totalOutAvgDur = countOutAvgDur > 0 ? sumOutAvgDur / countOutAvgDur : 0;
+  const totalPerCapDur = countPerCapDur > 0 ? sumPerCapDur / countPerCapDur : 0;
+  const sumVals = ['合计', totalOut, totalReturnCust, totalNewCust, totalOutConn, totalOutRate,
+    callRecords.filter(r=>r.outbound&&r.over30s).length, totalOutOver30Rate,
+    callRecords.filter(r=>r.outbound&&r.over3min).length, totalOutAvgDur,
+    totalIn, totalInConn, totalInRate, totalWxAdd, totalQwAdd, sumTotalDur, totalPerCapDur];
+  sumVals.forEach((v, i) => {
+    const cell = ws2.getRow(row).getCell(i+1);
+    const isPct = [5,7,12].includes(i);
+    setBodyCell(cell, isPct ? Math.round(v*1e4)/1e4 : (typeof v === 'number' ? Math.round(v*10)/10 : v), {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}}, null, isPct ? pctFmt : null);
+  });
+
+  ws2.views = [{state:'frozen', ySplit:5}];
+  ws2.columns = [14,10,10,10,10,10,10,11,11,13,13,10,10,10,10,10,13,13].map(w => ({width:w}));
+  updateProgress(68);
+
+  // =================== Sheet 3: 周报报表 ===================
+  const wsWeek = wb.addWorksheet('周报报表');
+  wsWeek.mergeCells(1, 1, 1, NCOLS);
+  wsWeek.getCell('A1').value = `${brand} · 周报报表 KW${kw}（${weekStartStr}~${weekEndStr}）`;
+  wsWeek.getCell('A1').font = titleFont;
+  wsWeek.getCell('A1').alignment = centerAlign;
+
+  wsWeek.mergeCells(2, 1, 2, NCOLS);
+  wsWeek.getCell('A2').value = `生成: ${todayStr} | 统计周期: ${weekStartStr}~${weekEndStr}`;
+  wsWeek.getCell('A2').font = smallFont;
+
+  // 当周汇总
+  const weekOut = weekRecords.filter(r => r.outbound);
+  const weekIn = weekRecords.filter(r => !r.outbound);
+  const weekOutTotal = weekOut.length;
+  const weekOutConn = weekOut.filter(r => r.conn).length;
+  const weekOutRate = weekOutTotal > 0 ? weekOutConn / weekOutTotal : 0;
+  const weekOutDur = weekOut.filter(r => r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const weekTotalDur = weekRecords.filter(r => r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const weekOutOver30 = weekOut.filter(r => r.over30s).length;
+  const weekOutOver30Rate = weekOutConn > 0 ? weekOutOver30 / weekOutConn : 0;
+  const weekOutOver3min = weekOut.filter(r => r.over3min).length;
+  const weekOutAvgDur = weekOutConn > 0 ? weekOutDur / weekOutConn : 0;
+  const weekNewCust = weekOut.filter(r => r.isNewCustomer).length;
+  const weekReturnCust = weekOut.filter(r => r.isReturning).length;
+  const weekInTotal = weekIn.length;
+  const weekInConn = weekIn.filter(r => r.conn).length;
+  const weekInRate = weekInTotal > 0 ? weekInConn / weekInTotal : 0;
+  const weekActive = [...new Set([...weekOut.map(r=>r.emp), ...weekWx.map(r=>r.emp), ...weekQw.map(r=>r.emp)])].length;
+  const weekStores = [...new Set([...weekOut.map(r=>r.store), ...weekWx.map(r=>r.store), ...weekQw.map(r=>r.store)])].filter(s => s !== '--' && s !== '未分组').length;
+  const weekPerCapDur = weekActive > 0 ? weekTotalDur / weekActive : 0;
+
+  // KPI 大数卡片
+  const weekKpiData = [
+    {v:weekOutTotal, c:PALETTE[0], l:'当周外呼'},
+    {v:weekOutConn, c:PALETTE[1], l:'外呼接通'},
+    {v:`${(weekOutRate*100).toFixed(1)}%`, c:PALETTE[2], l:'外呼接通率'},
+    {v:`${weekTotalDur.toFixed(0)}分`, c:PALETTE[3], l:'通话时长'},
+    {v:`${weekPerCapDur.toFixed(1)}分/人`, c:PALETTE[4], l:'人均通话时长'},
+    {v:weekQwTotal, c:PALETTE[5], l:'当周企微加微'},
+    {v:weekWxTotal, c:PALETTE[6], l:'当周个微加微'},
+    {v:`${weekInTotal}通`, c:PALETTE[7], l:'当周呼入'},
+    {v:weekActive, c:PALETTE[8], l:'活跃员工'},
+    {v:weekStores, c:PALETTE[9], l:'活跃门店'},
+  ];
+  weekKpiData.forEach((k, i) => {
+    const c = wsWeek.getRow(4).getCell(i+1);
+    c.value = k.v; c.font = {name:'Microsoft YaHei', size:16, bold:true, color:{argb:k.c}};
+    c.alignment = centerAlign;
+  });
+  weekKpiData.forEach((k, i) => {
+    const c = wsWeek.getRow(5).getCell(i+1);
+    c.value = k.l; c.font = {name:'Microsoft YaHei', size:9, bold:true, color:{argb:'333333'}};
+    c.alignment = centerAlign;
+  });
+
+  // 分类表头 (行7)
+  wsWeek.mergeCells(7, 2, 7, 9);
+  wsWeek.mergeCells(7, 10, 7, 12);
+  wsWeek.mergeCells(7, 13, 7, 14);
+  wsWeek.mergeCells(7, 15, 7, 16);
+  wsWeek.mergeCells(7, 17, 7, 18);
+  [{col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:10, v:'工作手机接听情况'},
+   {col:13, v:'个微加微情况'},{col:15, v:'企微加微情况'},{col:17, v:'沟通时长统计'}].forEach(ch => {
+    const c = wsWeek.getRow(7).getCell(ch.col);
+    c.value = ch.v; c.font = catFont; c.fill = catFill; c.alignment = centerAlign;
+    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  });
+  for (let i = 1; i <= NCOLS; i++) {
+    const c = wsWeek.getRow(7).getCell(i);
+    if (!c.value) { c.fill = catFill; c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder }; }
+  }
+
+  // 列标题 (行8)
+  wsWeek.getRow(8).getCell(1).value = '员工';
+  wsWeek.getRow(8).getCell(1).font = hdrFont; wsWeek.getRow(8).getCell(1).fill = hdrFill;
+  wsWeek.getRow(8).getCell(1).alignment = centerAlign;
+  wsWeek.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  const weekDetHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','个微好友','当周个微','企微好友','当周企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
+  for (let i = 1; i < weekDetHdrs.length; i++) {
+    const c = wsWeek.getRow(8).getCell(i+1);
+    c.value = weekDetHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
+    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
+  }
+
+  wsWeek.views = [{state:'frozen', ySplit:8}];
+
+  // 按门店分组
+  row = 9;
+  let wkAllOutAvgDurSum = 0, wkAllOutAvgDurCount = 0;
+  visibleStores.forEach(st => {
+    const stWeek = weekRecords.filter(r => r.store === st);
+    const stEmps = [...new Set(stWeek.map(r => r.emp))].sort();
+
+    wsWeek.mergeCells(row, 1, row, NCOLS);
+    wsWeek.getCell(`A${row}`).value = st;
+    wsWeek.getCell(`A${row}`).font = subFont;
+    row++;
+
+    const rStart = row;
+    let stOut=0, stOutConn=0, stOutOver30=0, stOutDeep=0, stNew=0, stReturn=0;
+    let stIn=0, stInConn=0, stWx=0, stWeekWx=0, stQw=0, stWeekQw=0, stOutDur=0, stTotalDur=0;
+    let stOutAvgDurSum=0, stOutAvgDurCount=0;
+
+    stEmps.forEach(emp => {
+      const ed = stWeek.filter(r => r.emp === emp);
+      const out = ed.filter(r => r.outbound);
+      const inn = ed.filter(r => !r.outbound);
+      const outCalls = out.length, outConn = out.filter(r => r.conn).length;
+      const outRate = outCalls > 0 ? outConn/outCalls : 0;
+      const outOver30 = out.filter(r => r.over30s).length;
+      const outOver30Rate = outConn > 0 ? outOver30/outConn : 0;
+      const outDeep = out.filter(r => r.over3min).length;
+      const outAvgDur = outConn > 0 ? out.filter(r=>r.conn).reduce((s,r)=>s+r.durSec,0)/60/outConn : 0;
+      if (outConn > 0) { stOutAvgDurSum += outAvgDur; stOutAvgDurCount++; }
+      const outNew = out.filter(r => r.isNewCustomer).length;
+      const outReturn = out.filter(r => r.isReturning).length;
+      const inCalls = inn.length, inConn = inn.filter(r => r.conn).length;
+      const inRate = inCalls > 0 ? inConn/inCalls : 0;
+      const outDur = out.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+      const totalDur = ed.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+      const wxc = weekWx.filter(r => r.emp === emp).length;
+      const wxcTotal = wxRecords.filter(r => r.emp === emp).length;
+      const qwc = weekQw.filter(r => r.emp === emp).length;
+      const qwcTotal = qwRecords.filter(r => r.emp === emp).length;
+
+      stOut+=outCalls; stOutConn+=outConn; stOutOver30+=outOver30; stOutDeep+=outDeep;
+      stNew+=outNew; stReturn+=outReturn; stIn+=inCalls; stInConn+=inConn;
+      stWx+=wxcTotal; stWeekWx+=wxc; stQw+=qwcTotal; stWeekQw+=qwc; stOutDur+=outDur; stTotalDur+=totalDur;
+
+      const vals = [emp, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
+        outDeep, inCalls, inConn, inRate, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
+      vals.forEach((v, i) => {
+        const cell = wsWeek.getRow(row).getCell(i+1);
+        const isPct = [5,7,11].includes(i);
+        setBodyCell(cell, isPct ? Math.round(v*1e4)/1e4 : (typeof v === 'number' ? Math.round(v*10)/10 : v), bodyFont, null, isPct ? pctFmt : null);
+      });
+      row++;
+    });
+
+    // 仅微信员工
+    const wxOnly = [...new Set([...wxEmps, ...qwEmps])].filter(e => !callEmps.includes(e));
+    wxOnly.forEach(emp => {
+      const empStore = (wxRecords.find(r=>r.emp===emp)||qwRecords.find(r=>r.emp===emp))?.store;
+      if (empStore !== st) return;
+      const wxc = weekWx.filter(r => r.emp === emp).length;
+      const wxcTotal = wxRecords.filter(r => r.emp === emp).length;
+      const qwc = weekQw.filter(r => r.emp === emp).length;
+      const qwcTotal = qwRecords.filter(r => r.emp === emp).length;
+      stWx+=wxcTotal; stWeekWx+=wxc; stQw+=qwcTotal; stWeekQw+=qwc;
+      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
+      vals.forEach((v, i) => {
+        const cell = wsWeek.getRow(row).getCell(i+1);
+        setBodyCell(cell, v, bodyFont, null, [5,7,11].includes(i)?pctFmt:null);
+      });
+      row++;
+    });
+
+    const rEnd = row - 1;
+    altRow(wsWeek, rStart, rEnd, NCOLS);
+
+    // 门店合计 — 平均外呼接通时长排除0值
+    const stOutRate = stOut > 0 ? stOutConn/stOut : 0;
+    const stOutOver30Rate = stOutConn > 0 ? stOutOver30/stOutConn : 0;
+    const stInRate = stIn > 0 ? stInConn/stIn : 0;
+    const stAvgDur = stOutAvgDurCount > 0 ? stOutAvgDurSum / stOutAvgDurCount : 0;
+    wkAllOutAvgDurSum += stOutAvgDurSum; wkAllOutAvgDurCount += stOutAvgDurCount;
+    const stVals = ['门店合计', stOut, stReturn, stNew, stOutConn, stOutRate, stOutOver30, stOutOver30Rate,
+      stOutDeep, stIn, stInConn, stInRate, stWx, stWeekWx, stQw, stWeekQw, stAvgDur, stTotalDur];
+    const boldFont = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
+    stVals.forEach((v, i) => {
+      const cell = wsWeek.getRow(row).getCell(i+1);
+      setBodyCell(cell, [5,7,11].includes(i) ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont, altFill, [5,7,11].includes(i)?pctFmt:null);
+    });
+    row += 2;
+  });
+
+  // 全店合计 — 平均外呼接通时长排除0值
+  wsWeek.mergeCells(row, 1, row, NCOLS);
+  wsWeek.getCell(`A${row}`).value = '全店合计'; wsWeek.getCell(`A${row}`).font = subFont;
+  row++;
+  const wkAllAvgDur = wkAllOutAvgDurCount > 0 ? wkAllOutAvgDurSum / wkAllOutAvgDurCount : 0;
+  const weekGrandVals = ['全店', weekOutTotal, weekReturnCust, weekNewCust, weekOutConn, weekOutRate,
+    weekOutOver30, weekOutOver30Rate, weekOutOver3min, weekInTotal, weekInConn, weekInRate,
+    wxRecords.length, weekWxTotal, qwRecords.length, weekQwTotal, wkAllAvgDur, weekTotalDur];
+  weekGrandVals.forEach((v, i) => {
+    const cell = wsWeek.getRow(row).getCell(i+1);
+    setBodyCell(cell, [5,7,11].includes(i) ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont2, altFill, [5,7,11].includes(i)?pctFmt:null);
+  });
+
+  wsWeek.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
+  updateProgress(75);
+
+  // =================== Sheet 4: 数据概览 ===================
+  const ws3 = wb.addWorksheet('数据概览');
+  ws3.mergeCells('A1:J1');
+  ws3.getCell('A1').value = `${brand}整体使用情况`; ws3.getCell('A1').font = titleFont;
+  ws3.mergeCells('A2:J2');
+  ws3.getCell('A2').value = `${fullStart}~${fullEnd}（${nDays}天）| ${visibleStores.length}门店·${allEmps.length}员工 | 生成: ${todayStr}`;
+  ws3.getCell('A2').font = smallFont;
+
+  const kpi3Vals = [totalOut, totalOutConn, totalOutRate, Math.round(avgDaily),
+    visibleStores.length, callEmps.length, Math.round(totalOutDur/callEmps.length*10)/10, weekQwTotal, weekWxTotal, totalIn];
+  const kpi3Labels = ['外呼触达总量','外呼成功接通','外呼接通率','日均客户覆盖','活跃门店数','活跃员工数','人均通话时长','当周企微加微','当周个微加微','全量呼入总量'];
+  const kpi3Descs = ['通外呼触达','通有效通话','接通数/外呼数','通/天','家门店在运营','人使用系统','分钟/人',`${weekStartStr}~${weekEndStr}`,`${weekStartStr}~${weekEndStr}`,'通呼入来电'];
+
+  kpi3Vals.forEach((v, i) => {
+    const c = ws3.getRow(4).getCell(i+1);
+    c.value = i === 2 ? v : (typeof v === 'number' && !Number.isInteger(v) ? Math.round(v*10)/10 : v);
+    c.font = {name:'Microsoft YaHei', size:18, bold:true, color:{argb:PALETTE[i]}};
+    c.alignment = centerAlign;
+    if (i === 2) c.numFmt = pctFmt;
+  });
+  kpi3Labels.forEach((l, i) => {
+    const c = ws3.getRow(5).getCell(i+1);
+    c.value = l; c.font = {name:'Microsoft YaHei', size:9, bold:true, color:{argb:'333333'}};
+    c.alignment = centerAlign;
+  });
+  kpi3Descs.forEach((l, i) => {
+    const c = ws3.getRow(6).getCell(i+1);
+    c.value = l; c.font = {name:'Microsoft YaHei', size:8, color:{argb:'888888'}};
+    c.alignment = centerAlign;
+  });
+
+  row = 8;
+  ws3.getCell(`A${row}`).value = '门店运营效能总览'; ws3.getCell(`A${row}`).font = subFont;
+  row = 9;
+  setHdr(ws3.getRow(row), ['门店','外呼量','接通量','接通率','日均外呼','活跃员工','工作手机通话总时长（分钟）','企微加微','个微加微','新客占比']);
+  const r3Start = row + 1;
+  visibleStores.forEach(st => {
+    row++;
+    const sd = callRecords.filter(r => r.store === st);
+    const out = sd.filter(r => r.outbound);
+    const calls = out.length, conns = out.filter(r=>r.conn).length;
+    const rate = calls>0?conns/calls:0;
+    const daily = calls/nDays;
+    const emps = [...new Set(sd.map(r=>r.emp))].length;
+    const dur = sd.filter(r=>r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+    const qwCount = weekQw.filter(r=>r.store===st).length;
+    const wxCount = weekWx.filter(r=>r.store===st).length;
+    const newRatio = calls>0?out.filter(r=>r.isNewCustomer).length/calls:0;
+    [st, calls, conns, Math.round(rate*1e4)/1e4, Math.round(daily), emps, Math.round(dur), qwCount, wxCount, Math.round(newRatio*1e4)/1e4].forEach((v,i)=>{
+      setBodyCell(ws3.getRow(row).getCell(i+1), v, bodyFont, null, [3,9].includes(i)?pctFmt:null);
+    });
+  });
+  row++;
+  const totalNewRatio = totalOut>0?totalNewCust/totalOut:0;
+  ['合计', totalOut, totalOutConn, Math.round(totalOutRate*1e4)/1e4, Math.round(avgDaily), callEmps.length, Math.round(totalOutDur), weekQwTotal, weekWxTotal, Math.round(totalNewRatio*1e4)/1e4].forEach((v,i)=>{
+    setBodyCell(ws3.getRow(row).getCell(i+1), v, {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}}, altFill, [3,9].includes(i)?pctFmt:null);
+  });
+  altRow(ws3, r3Start, row-1, 10);
+
+  row += 2;
+  ws3.getCell(`A${row}`).value = '系统采纳指标'; ws3.getCell(`A${row}`).font = subFont;
+  row++;
+  setHdr(ws3.getRow(row), ['指标','数值','说明']);
+  const sysData = [
+    ['通话系统使用员工', `${callEmps.length}人`, ''],
+    ['企微系统使用员工', `${qwEmps.length}人`, ''],
+    ['个微系统使用员工', `${wxEmps.length}人`, ''],
+    ['通话总时长', `${Math.round(totalDur)}分钟`, `约${(totalDur/60).toFixed(1)}h`],
+    ['外呼接通率', Math.round(totalOutRate*1e4)/1e4, ''],
+    ['双系统并行员工', `${dualEmps.length}人`, `占比${(dualEmps.length/allEmps.length*100).toFixed(1)}%`],
+  ];
+  const r3sStart = row + 1;
+  sysData.forEach(([metric, val, desc]) => {
+    row++;
+    setBodyCell(ws3.getRow(row).getCell(1), metric);
+    setBodyCell(ws3.getRow(row).getCell(2), val, bodyFont, null, metric==='外呼接通率'?pctFmt:null);
+    setBodyCell(ws3.getRow(row).getCell(3), desc);
+  });
+  altRow(ws3, r3sStart, row, 3);
+  ws3.views = [{state:'frozen', ySplit:7}];
+  ws3.columns = [18,13,13,13,13,13,13,13,13,13].map(w => ({width:w}));
+  updateProgress(82);
+
+  // =================== Sheet 4: 门店效能 ===================
+  const ws4 = wb.addWorksheet('门店效能分析');
+  ws4.getCell('A1').value = '门店效能分析'; ws4.getCell('A1').font = titleFont;
+  ws4.getCell('A2').value = `${visibleStores.length}家门店客户覆盖与接通效率对比（全量外呼）| ${todayStr}`;
+  ws4.getCell('A2').font = smallFont;
+  setHdr(ws4.getRow(4), ['门店','外呼量','接通量','接通率','日均外呼','活跃员工','人均外呼','新客占比','平均外呼接通时长']);
+  row = 5;
+  visibleStores.forEach(st => {
+    const sd = callRecords.filter(r => r.store === st && r.outbound);
+    const calls = sd.length, conns = sd.filter(r=>r.conn).length;
+    const rate = calls>0?conns/calls:0;
+    const emps = [...new Set(sd.map(r=>r.emp))].length;
+    const newRatio = calls>0?sd.filter(r=>r.isNewCustomer).length/calls:0;
+    const avgDur = conns>0?sd.filter(r=>r.conn).reduce((s,r)=>s+r.durSec,0)/60/conns:0;
+    [st, calls, conns, Math.round(rate*1e4)/1e4, Math.round(calls/nDays), emps, Math.round(calls/emps), Math.round(newRatio*1e4)/1e4, Math.round(avgDur*10)/10].forEach((v,i)=>{
+      setBodyCell(ws4.getRow(row).getCell(i+1), v, bodyFont, null, [3,7].includes(i)?pctFmt:null);
+    });
+    row++;
+  });
+  [ '合计', totalOut, totalOutConn, Math.round(totalOutRate*1e4)/1e4, Math.round(avgDaily), callEmps.length,
+    Math.round(totalOut/callEmps.length), Math.round(totalNewCust/totalOut*1e4)/1e4,
+    Math.round(totalOutConn>0 ? totalOutDur/totalOutConn*10 : 0)/10
+  ].forEach((v,i)=>{
+    setBodyCell(ws4.getRow(row).getCell(i+1), v, {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}}, null, [3,7].includes(i)?pctFmt:null);
+  });
+  altRow(ws4, 5, row-1, 9);
+  ws4.views = [{state:'frozen', ySplit:3}];
+  updateProgress(88);
+
+  // =================== Sheet 5: 员工活跃度 ===================
+  const ws5 = wb.addWorksheet('员工活跃度分析');
+  ws5.getCell('A1').value = '员工活跃度分析'; ws5.getCell('A1').font = titleFont;
+  setHdr(ws5.getRow(4), ['员工','门店','企微好友','个微好友','外呼量','接通量','接通率','活跃度','主打系统','评级']);
+
+  const empStats = callEmps.map(emp => {
+    const ed = callRecords.filter(r => r.emp === emp && r.outbound);
+    const store = (callRecords.find(r=>r.emp===emp)||{}).store||'未知';
+    const calls = ed.length, conns = ed.filter(r=>r.conn).length;
+    const rate = calls>0?conns/calls:0;
+    const qwFriends = qwRecords.filter(r => r.emp === emp).length;
+    const wxFriends = wxRecords.filter(r => r.emp === emp).length;
+    const allPhones = [...new Set(ed.map(r=>r.phone).filter(p=>p&&p!=='--'))];
+    const connPhones = [...new Set(ed.filter(r=>r.conn).map(r=>r.phone).filter(p=>p&&p!=='--'))];
+    const custRate = allPhones.length>0?connPhones.length/allPhones.length:0;
+    let sysType = '';
+    if (calls>0 && (qwFriends>0||wxFriends>0)) sysType = '双系统并重';
+    else if (calls>0) sysType = '通话覆盖';
+    else sysType = '企微获客';
+    return {emp, store, qwFriends, wxFriends, calls, conns, rate, custRate, sysType};
+  });
+  // 仅微信/企微员工
+  [...new Set([...wxEmps, ...qwEmps])].filter(e=>!callEmps.includes(e)).forEach(emp => {
+    const qwFriends = qwRecords.filter(r=>r.emp===emp).length;
+    const wxFriends = wxRecords.filter(r=>r.emp===emp).length;
+    empStats.push({emp, store:(wxRecords.find(r=>r.emp===emp)||qwRecords.find(r=>r.emp===emp)||{}).store||'未知', qwFriends, wxFriends, calls:0, conns:0, rate:0, custRate:0, sysType:'企微获客'});
+  });
+
+  const maxCalls = Math.max(...empStats.map(e=>e.calls), 1);
+  const maxFriends = Math.max(...empStats.map(e=>e.qwFriends+e.wxFriends), 1);
+  empStats.forEach(e => {
+    const totalFriends = e.qwFriends + e.wxFriends;
+    e.score = (e.calls/maxCalls)*0.4 + e.rate*0.3 + e.custRate*0.15 + (totalFriends/maxFriends)*0.15;
+    if (e.score >= 0.7) e.stars = '★★★★★';
+    else if (e.score >= 0.5) e.stars = '★★★★';
+    else if (e.score >= 0.3) e.stars = '★★★';
+    else if (e.score >= 0.15) e.stars = '★★';
+    else e.stars = '★';
+  });
+  empStats.sort((a,b) => b.score - a.score);
+
+  row = 5;
+  empStats.forEach(e => {
+    [e.emp, e.store, e.qwFriends, e.wxFriends, e.calls, e.conns, Math.round(e.rate*1e4)/1e4, Math.round(e.score*100)/100, e.sysType, e.stars].forEach((v,j)=>{
+      setBodyCell(ws5.getRow(row).getCell(j+1), v, bodyFont, e.score>=0.5?goodFill:null, j===6?pctFmt:(j===7?scoreFmt:null));
+    });
+    row++;
+  });
+  ws5.views = [{state:'frozen', ySplit:3}];
+  updateProgress(93);
+
+  // =================== Sheet 6: 时段效率 ===================
+  const ws6 = wb.addWorksheet('时段与效率分析');
+  ws6.getCell('A1').value = '时段与效率分析'; ws6.getCell('A1').font = titleFont;
+  ws6.getCell('A4').value = '分时段外呼效率'; ws6.getCell('A4').font = subFont;
+  setHdr(ws6.getRow(5), ['时段','外呼量','接通','接通率','效率评级']);
+
+  let bestHour = null, bestHourRate = 0;
+  row = 6;
+  for (let h = 0; h < 24; h++) {
+    const hd = callRecords.filter(r => r.hour === h && r.outbound);
+    if (hd.length === 0) continue;
+    const calls = hd.length, conns = hd.filter(r=>r.conn).length;
+    const rate = calls>0?conns/calls:0;
+    let eff, fill;
+    if (calls >= 50) {
+      if (rate >= 0.55) { eff = '高效'; fill = goodFill; }
+      else if (rate >= 0.35) { eff = '良好'; }
+      else { eff = '可优化'; }
+    } else { eff = '样本不足'; fill = badFill; }
+    if (calls >= 50 && rate > bestHourRate) { bestHourRate = rate; bestHour = [h, calls, rate]; }
+    [`${h}:00-${h+1}:00`, calls, conns, Math.round(rate*1e4)/1e4, eff].forEach((v,j)=>{
+      setBodyCell(ws6.getRow(row).getCell(j+1), v, bodyFont, fill||null, j===3?pctFmt:null);
+    });
+    row++;
+  }
+
+  row += 1;
+  ws6.getCell(`A${row}`).value = '星期外呼效率'; ws6.getCell(`A${row}`).font = subFont;
+  row++;
+  setHdr(ws6.getRow(row), ['星期','外呼量','接通','接通率','效率']);
+  row++;
+  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
+  let bestDowName = null, bestDowRate = 0;
+  dows.forEach((dn, d) => {
+    const dd = callRecords.filter(r => r.weekday === d && r.outbound);
+    const calls = dd.length, conns = dd.filter(r=>r.conn).length;
+    const rate = calls>0?conns/calls:0;
+    let eff, fill;
+    if (calls >= 50) {
+      if (rate >= 0.55) { eff = '高效'; fill = goodFill; }
+      else if (rate >= 0.35) { eff = '良好'; }
+      else { eff = '可优化'; }
+    } else { eff = '样本不足'; fill = badFill; }
+    if (calls >= 50 && rate > bestDowRate) { bestDowRate = rate; bestDowName = dn; }
+    [dn, calls, conns, Math.round(rate*1e4)/1e4, eff].forEach((v,j)=>{
+      setBodyCell(ws6.getRow(row).getCell(j+1), v, bodyFont, fill||null, j===3?pctFmt:null);
+    });
+    row++;
+  });
+  row++;
+  const bh = bestHour ? `${String(bestHour[0]).padStart(2,'0')}:00（${bestHour[1]}通，${(bestHour[2]*100).toFixed(1)}%）` : '待积累';
+  const bd = bestDowName ? `${bestDowName}（${(bestDowRate*100).toFixed(1)}%）` : '待积累';
+  ws6.getCell(`A${row}`).value = `> 最佳外呼时段: ${bh} | 最佳日: ${bd}`;
+  ws6.getCell(`A${row}`).font = {name:'Microsoft YaHei', size:10, bold:true, color:{argb:DARK_BLUE}};
+  ws6.views = [{state:'frozen', ySplit:4}];
+  updateProgress(97);
+
+  // =================== Sheet 7: 周度综合结论 ===================
+  const ws7 = wb.addWorksheet('周度综合结论');
+  ws7.getCell('A1').value = '周度综合结论'; ws7.getCell('A1').font = titleFont;
+  ws7.getCell('A2').value = `KW${kw} | ${weekStartStr}~${weekEndStr}（日报日期${reportDateStr}所在周）| 生成: ${todayStr}`;
+  ws7.getCell('A2').font = goldFont;
+  ws7.getCell('A4').value = '核心结论'; ws7.getCell('A4').font = subFont;
+  row = 5;
+  setHdr(ws7.getRow(row), ['#','结论','关键数据']);
+  row++;
+  const wOut = weekRecords.filter(r => r.outbound);
+  const wOutCalls = wOut.length, wOutConn = wOut.filter(r=>r.conn).length;
+  const wOutRate = wOutCalls>0?wOutConn/wOutCalls:0;
+  const wIn = weekRecords.filter(r => !r.outbound);
+  const conclusions = [
+    [1, `本周${visibleStores.length}家门店${callEmps.length}名员工`, `外呼${wOutCalls}通，接通${wOutConn}通，呼入${wIn.length}通`],
+    [2, `本周外呼接通率${(wOutRate*100).toFixed(1)}%`, `日均外呼${(wOutCalls/4).toFixed(0)}通/天，新客占比${wOutCalls>0?(wOut.filter(r=>r.isNewCustomer).length/wOutCalls*100).toFixed(1):0}%`],
+    [3, `最佳外呼时段: ${bestHour?String(bestHour[0]).padStart(2,'0')+':00':'待积累'}`, bestHour?`${bestHour[1]}通 ${(bestHour[2]*100).toFixed(1)}%`:'' ],
+    [4, `${callEmps.length}名员工使用通话系统`, `双系统并行${dualEmps.length}人，个微员工${wxEmps.length}人，企微员工${qwEmps.length}人`],
+    [5, `企微本周新增${weekQwTotal}人，个微新增${weekWxTotal}人`, `企微全量${qwRecords.length}人，个微全量${wxRecords.length}人`],
+  ];
+  conclusions.forEach(([num, c, d]) => {
+    [num, c, d].forEach((v,i)=>setBodyCell(ws7.getRow(row).getCell(i+1), v));
+    row++;
+  });
+  altRow(ws7, 6, row-1, 3);
+
+  row += 1;
+  ws7.getCell(`A${row}`).value = '门店排名'; ws7.getCell(`A${row}`).font = subFont;
+  row++;
+  setHdr(ws7.getRow(row), ['排名','门店','外呼量','接通率','新客占比']);
+  row++;
+  const storeRanks = visibleStores.map(st => {
+    const sd = callRecords.filter(r=>r.store===st && r.outbound);
+    const calls = sd.length, conns = sd.filter(r=>r.conn).length;
+    const newRatio = calls>0?sd.filter(r=>r.isNewCustomer).length/calls:0;
+    return {st, calls, rate:calls>0?conns/calls:0, newRatio};
+  }).sort((a,b) => b.rate - a.rate);
+  storeRanks.forEach((sr, i) => {
+    [i+1, sr.st, sr.calls, Math.round(sr.rate*1e4)/1e4, Math.round(sr.newRatio*1e4)/1e4].forEach((v,j)=>{
+      setBodyCell(ws7.getRow(row).getCell(j+1), v, bodyFont, null, [3,4].includes(j)?pctFmt:null);
+    });
+    row++;
+  });
+  altRow(ws7, row-storeRanks.length, row-1, 5);
+  ws7.views = [{state:'frozen', ySplit:3}];
+  ws7.columns = [6,55,25,25,25].map(w => ({width:w}));
+
+  updateProgress(100);
+
+  // 导出
+  showStatus('info', '正在生成Excel文件...');
+  const buffer = await wb.xlsx.writeBuffer();
+  resultBlob = new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+
+  document.getElementById('dlBtn').style.display = 'block';
+  document.getElementById('progress').style.display = 'none';
+  showStatus('success', `报告生成完成！共 8 个Sheet：外呼${dayOutTotal}通，接通${dayOutConn}（${(dayOutRate*100).toFixed(1)}%），呼入${dayInTotal}通，企微加微${dayQwCount}人，个微加微${dayWxCount}人`);
+}
+
+function download() {
+  if (!resultBlob) return;
+  const reportDate = document.getElementById('reportDate').value;
+  const brand = document.getElementById('brandName').value.trim() || '品牌';
+  const dt = new Date(reportDate + 'T00:00:00');
+  const mmdd = `${String(dt.getMonth()+1).padStart(2,'0')}${String(dt.getDate()).padStart(2,'0')}`;
+  const today = dateStr(new Date()).replace(/-/g,'');
+  const filename = `${mmdd}${brand}工作手机分析报告_${today}.xlsx`;
+
+  const url = URL.createObjectURL(resultBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ===================== UI 辅助 =====================
+function showStatus(type, msg) {
+  const el = document.getElementById('status');
+  el.className = 'status ' + type;
+  el.textContent = msg;
+}
+
+function updateProgress(pct) {
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+</script>
+</body>
+</html>
