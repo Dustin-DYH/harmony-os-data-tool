@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鸿蒙智行定制化数据分析工具</title>
+<title>车企定制化数据分析工具</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <style>
@@ -46,7 +46,7 @@ input:focus{outline:none;border-color:#0f3460}
 </head>
 <body>
 <div class="header">
-  <h1>鸿蒙智行定制化数据分析工具 <span class="badge">beta v1.0</span></h1>
+  <h1>车企定制化数据分析工具 <span class="badge">beta v1.1</span></h1>
   <div class="sub">上传通话记录 + 个微客户数据 + 企微客户数据，生成标准化效能分析报告</div>
 </div>
 
@@ -110,7 +110,7 @@ input:focus{outline:none;border-color:#0f3460}
     <button class="btn btn-download" id="dlBtn" style="display:none" onclick="download()">下载分析报告 (.xlsx)</button>
   </div>
 </div>
-<div class="footer">鸿蒙智行定制化数据分析工具 beta版 v0.1 | 纯前端处理，数据不上传服务器</div>
+<div class="footer">车企定制化数据分析工具 beta版 v0.1 | 纯前端处理，数据不上传服务器</div>
 
 <script>
 // ===================== 全局状态 =====================
@@ -447,6 +447,7 @@ async function generate() {
   const totalInRate = totalIn > 0 ? totalInConn / totalIn : 0;
   const totalOutDur = callRecords.filter(r => r.outbound && r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
   const totalDur = callRecords.filter(r => r.conn).reduce((s, r) => s + r.durSec, 0) / 60;
+  const totalUniquePhones = [...new Set(callRecords.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
   const avgDaily = totalOut / nDays;
   const totalNewCust = callRecords.filter(r => r.outbound && r.isNewCustomer).length;
   const totalReturnCust = callRecords.filter(r => r.outbound && r.isReturning).length;
@@ -463,7 +464,7 @@ async function generate() {
   // ===================== 构建 Excel =====================
   const ExcelJS = window.ExcelJS;
   const wb = new ExcelJS.Workbook();
-  wb.creator = '鸿蒙智行定制化数据分析工具 beta v1.0';
+  wb.creator = '车企定制化数据分析工具 beta v1.1';
 
   const DARK_BLUE = '0f3460';
   const ACCENT_RED = 'e94560';
@@ -518,7 +519,7 @@ async function generate() {
 
   // =================== Sheet 1: 日报报表 ===================
   const ws1 = wb.addWorksheet('日报报表');
-  const NCOLS = 18;
+  const NCOLS = 19;
   ws1.mergeCells(1, 1, 1, NCOLS);
   ws1.getCell('A1').value = `${brand} · 日报报表 ${reportDateStr}`;
   ws1.getCell('A1').font = titleFont;
@@ -527,6 +528,9 @@ async function generate() {
   ws1.mergeCells(2, 1, 2, NCOLS);
   ws1.getCell('A2').value = `生成: ${todayStr} | 统计日期: ${reportDateStr}`;
   ws1.getCell('A2').font = smallFont;
+
+  // 日报去重联系客户数
+  const dayUniquePhones = [...new Set(dayRecords.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
 
   // KPI 大数卡片 (行4-5, 10列)
   const kpiData = [
@@ -539,7 +543,7 @@ async function generate() {
     {v:dayWxCount, c:PALETTE[6], l:'当日个微加微'},
     {v:`${dayInTotal}通`, c:PALETTE[7], l:'当日呼入'},
     {v:dayActive, c:PALETTE[8], l:'活跃员工'},
-    {v:dayStores, c:PALETTE[9], l:'活跃门店'},
+    {v:dayUniquePhones, c:PALETTE[9], l:'联系客户数'},
   ];
   kpiData.forEach((k, i) => {
     const c = ws1.getRow(4).getCell(i+1);
@@ -552,33 +556,30 @@ async function generate() {
     c.alignment = centerAlign;
   });
 
-  // 分类表头 (行7)
-  // 基本信息 | 工作手机外呼情况 | 工作手机接听情况 | 微信加微 | 企微加微 | 沟通时长
-  ws1.mergeCells(7, 2, 7, 9); // 工作手机外呼情况
-  ws1.mergeCells(7, 10, 7, 12); // 工作手机接听情况
-  ws1.mergeCells(7, 13, 7, 14); // 个微加微情况
-  ws1.mergeCells(7, 15, 7, 16); // 企微加微情况
-  ws1.mergeCells(7, 17, 7, 18); // 沟通时长统计
+  // 分类表头 (行7): 基本信息 | 外呼情况(8) | 接听情况(3) | 联系客户(1) | 个微(2) | 企微(2) | 沟通时长(2)
+  ws1.mergeCells(7, 2, 7, 9);
+  ws1.mergeCells(7, 10, 7, 12);
+  ws1.mergeCells(7, 14, 7, 15);
+  ws1.mergeCells(7, 16, 7, 17);
+  ws1.mergeCells(7, 18, 7, 19);
 
   const catHeaders = [
     {col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:10, v:'工作手机接听情况'},
-    {col:13, v:'个微加微情况'},{col:15, v:'企微加微情况'},{col:17, v:'沟通时长统计'},
+    {col:13, v:'联系客户'},{col:14, v:'个微加微情况'},{col:16, v:'企微加微情况'},{col:18, v:'沟通时长统计'},
   ];
   catHeaders.forEach(ch => {
     const c = ws1.getRow(7).getCell(ch.col);
     c.value = ch.v; c.font = catFont; c.fill = catFill; c.alignment = centerAlign;
     c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
   });
-  // fill remaining category header cells
   for (let i = 1; i <= NCOLS; i++) {
     const c = ws1.getRow(7).getCell(i);
     if (!c.value) { c.fill = catFill; c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder }; }
   }
-  // 基本信息 row 8
   ws1.getRow(8).getCell(1).value = '员工'; ws1.getRow(8).getCell(1).font = hdrFont; ws1.getRow(8).getCell(1).fill = hdrFill; ws1.getRow(8).getCell(1).alignment = centerAlign; ws1.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
 
   // 列标题 (行8)
-  const detHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','个微好友','当日个微','企微好友','当日企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
+  const detHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','联系客户数','个微好友','当日个微','企微好友','当日企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
   for (let i = 1; i < detHdrs.length; i++) {
     const c = ws1.getRow(8).getCell(i+1);
     c.value = detHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
@@ -593,6 +594,7 @@ async function generate() {
   visibleStores.forEach(st => {
     const stDay = dayRecords.filter(r => r.store === st);
     const stEmps = [...new Set(stDay.map(r => r.emp))].sort();
+    const stUniquePhones = [...new Set(stDay.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
 
     ws1.mergeCells(row, 1, row, NCOLS);
     ws1.getCell(`A${row}`).value = st;
@@ -621,6 +623,7 @@ async function generate() {
       const inRate = inCalls > 0 ? inConn/inCalls : 0;
       const outDur = out.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
       const totalDur = ed.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+      const uniquePhones = [...new Set(ed.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
       const wxc = dayWx.filter(r => r.emp === emp).length;
       const wxcTotal = wxRecords.filter(r => r.emp === emp).length;
       const qwc = dayQw.filter(r => r.emp === emp).length;
@@ -631,7 +634,7 @@ async function generate() {
       stWx+=wxcTotal; stDayWx+=wxc; stQw+=qwcTotal; stDayQw+=qwc; stOutDur+=outDur; stTotalDur+=totalDur;
 
       const vals = [emp, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
-        outDeep, inCalls, inConn, inRate, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
+        outDeep, inCalls, inConn, inRate, uniquePhones, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
       vals.forEach((v, i) => {
         const cell = ws1.getRow(row).getCell(i+1);
         const isPct = [5,7,11].includes(i);
@@ -650,7 +653,7 @@ async function generate() {
       const qwc = dayQw.filter(r => r.emp === emp).length;
       const qwcTotal = qwRecords.filter(r => r.emp === emp).length;
       stWx+=wxcTotal; stDayWx+=wxc; stQw+=qwcTotal; stDayQw+=qwc;
-      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
+      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
       vals.forEach((v, i) => {
         const cell = ws1.getRow(row).getCell(i+1);
         setBodyCell(cell, v, bodyFont, null, [5,7,11].includes(i)?pctFmt:null);
@@ -668,7 +671,7 @@ async function generate() {
     const stAvgDur = stOutAvgDurCount > 0 ? stOutAvgDurSum / stOutAvgDurCount : 0;
     allOutAvgDurSum += stOutAvgDurSum; allOutAvgDurCount += stOutAvgDurCount;
     const stVals = ['门店合计', stOut, stReturn, stNew, stOutConn, stOutRate, stOutOver30, stOutOver30Rate,
-      stOutDeep, stIn, stInConn, stInRate, stWx, stDayWx, stQw, stDayQw, stAvgDur, stTotalDur];
+      stOutDeep, stIn, stInConn, stInRate, stUniquePhones, stWx, stDayWx, stQw, stDayQw, stAvgDur, stTotalDur];
     const boldFont = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
     stVals.forEach((v, i) => {
       const cell = ws1.getRow(row).getCell(i+1);
@@ -684,19 +687,19 @@ async function generate() {
   const allAvgDur = allOutAvgDurCount > 0 ? allOutAvgDurSum / allOutAvgDurCount : 0;
   const grandVals = ['全店', dayOutTotal, dayReturnCust, dayNewCust, dayOutConn, dayOutRate,
     dayOutOver30, dayOutOver30Rate, dayOutOver3min, dayInTotal, dayInConn, dayInRate,
-    wxRecords.length, dayWxCount, qwRecords.length, dayQwCount, allAvgDur, dayTotalDur];
+    dayUniquePhones, wxRecords.length, dayWxCount, qwRecords.length, dayQwCount, allAvgDur, dayTotalDur];
   const boldFont2 = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
   grandVals.forEach((v, i) => {
     const cell = ws1.getRow(row).getCell(i+1);
     setBodyCell(cell, [5,7,11].includes(i) ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont2, altFill, [5,7,11].includes(i)?pctFmt:null);
   });
 
-  ws1.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
+  ws1.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
   updateProgress(60);
 
   // =================== Sheet 2: 日度趋势 ===================
   const ws2 = wb.addWorksheet('工作手机日度趋势统计');
-  const NCOLS2 = 17;
+  const NCOLS2 = 18;
   ws2.mergeCells(1, 1, 1, NCOLS2);
   ws2.getCell('A1').value = '工作手机日度趋势统计'; ws2.getCell('A1').font = titleFont;
   ws2.getCell('A1').alignment = centerAlign;
@@ -704,16 +707,16 @@ async function generate() {
   ws2.getCell('A2').value = `全量日报汇总（${fullStart}~${fullEnd}，${nDays}天·${visibleStores.length}店）| 生成: ${todayStr}`;
   ws2.getCell('A2').font = smallFont;
 
-  // 分类表头 (行4)
-  ws2.mergeCells(4, 1, 5, 1); // 日期
-  ws2.mergeCells(4, 2, 4, 10); // 工作手机外呼情况
-  ws2.mergeCells(4, 11, 4, 13); // 工作手机接听情况
-  ws2.mergeCells(4, 14, 4, 15); // 加微情况
-  ws2.mergeCells(4, 16, 4, 17); // 沟通时长统计
+  // 分类表头 (行4): 基本信息 | 外呼(9) | 接听(3) | 联系客户(1) | 加微(2) | 沟通(2)
+  ws2.mergeCells(4, 1, 5, 1);
+  ws2.mergeCells(4, 2, 4, 10);
+  ws2.mergeCells(4, 11, 4, 13);
+  ws2.mergeCells(4, 15, 4, 16);
+  ws2.mergeCells(4, 17, 4, 18);
 
   const cat2 = [
     {col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:11, v:'工作手机接听情况'},
-    {col:14, v:'加微情况'},{col:16, v:'沟通时长统计'},
+    {col:14, v:'联系客户'},{col:15, v:'加微情况'},{col:17, v:'沟通时长统计'},
   ];
   cat2.forEach(ch => {
     const c = ws2.getRow(4).getCell(ch.col);
@@ -728,7 +731,7 @@ async function generate() {
   ws2.getRow(5).getCell(1).font = hdrFont; ws2.getRow(5).getCell(1).fill = hdrFill; ws2.getRow(5).getCell(1).alignment = centerAlign;
   ws2.getRow(5).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
 
-  const trendHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','平均外呼接通时长','呼入量','呼入接通量','呼入接通率','个微添数','企微添数','通话总时长','人均时长'];
+  const trendHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','平均外呼接通时长','呼入量','呼入接通量','呼入接通率','联系客户数','个微添数','企微添数','通话总时长','人均时长'];
   for (let i = 1; i < trendHdrs.length; i++) {
     const c = ws2.getRow(5).getCell(i+1);
     c.value = trendHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
@@ -739,6 +742,7 @@ async function generate() {
   const r2Start = row;
   let totalWxAdd = 0, totalQwAdd = 0;
   let sumTotalDur = 0, sumOutAvgDur = 0, countOutAvgDur = 0, sumPerCapDur = 0, countPerCapDur = 0;
+  let sumUniquePhones = 0;
   allDates.forEach(d => {
     const dd = callRecords.filter(r => r.date === d);
     const dOut = dd.filter(r => r.outbound);
@@ -762,13 +766,15 @@ async function generate() {
     const qwAdd = dayQwRecs.length;
     const activeEmps = [...new Set([...dOut.map(r=>r.emp), ...dayWxRecs.map(r=>r.emp), ...dayQwRecs.map(r=>r.emp)])].length;
     const perCapDur = activeEmps > 0 ? totalDur/activeEmps : 0;
+    const uniquePhones = [...new Set(dd.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
     totalWxAdd += wxAdd; totalQwAdd += qwAdd;
     sumTotalDur += totalDur;
+    sumUniquePhones += uniquePhones;
     if (outAvgDur > 0) { sumOutAvgDur += outAvgDur; countOutAvgDur++; }
     if (perCapDur > 0) { sumPerCapDur += perCapDur; countPerCapDur++; }
 
     const vals = [d, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
-      outDeep, outAvgDur, inCalls, inConn, inRate, wxAdd, qwAdd, totalDur, perCapDur];
+      outDeep, outAvgDur, inCalls, inConn, inRate, uniquePhones, wxAdd, qwAdd, totalDur, perCapDur];
     vals.forEach((v, i) => {
       const cell = ws2.getRow(row).getCell(i+1);
       const isPct = [5,7,12].includes(i);
@@ -788,7 +794,7 @@ async function generate() {
   const sumVals = ['合计', totalOut, totalReturnCust, totalNewCust, totalOutConn, totalOutRate,
     callRecords.filter(r=>r.outbound&&r.over30s).length, totalOutOver30Rate,
     callRecords.filter(r=>r.outbound&&r.over3min).length, totalOutAvgDur,
-    totalIn, totalInConn, totalInRate, totalWxAdd, totalQwAdd, sumTotalDur, totalPerCapDur];
+    totalIn, totalInConn, totalInRate, sumUniquePhones, totalWxAdd, totalQwAdd, sumTotalDur, totalPerCapDur];
   sumVals.forEach((v, i) => {
     const cell = ws2.getRow(row).getCell(i+1);
     const isPct = [5,7,12].includes(i);
@@ -796,7 +802,7 @@ async function generate() {
   });
 
   ws2.views = [{state:'frozen', ySplit:5}];
-  ws2.columns = [14,10,10,10,10,10,10,11,11,13,13,10,10,10,10,10,13,13].map(w => ({width:w}));
+  ws2.columns = [14,10,10,10,10,10,10,11,11,13,13,10,10,10,10,10,10,13,13].map(w => ({width:w}));
   updateProgress(68);
 
   // =================== Sheet 3: 周报报表 ===================
@@ -827,6 +833,7 @@ async function generate() {
   const weekInTotal = weekIn.length;
   const weekInConn = weekIn.filter(r => r.conn).length;
   const weekInRate = weekInTotal > 0 ? weekInConn / weekInTotal : 0;
+  const weekUniquePhones = [...new Set(weekRecords.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
   const weekActive = [...new Set([...weekOut.map(r=>r.emp), ...weekWx.map(r=>r.emp), ...weekQw.map(r=>r.emp)])].length;
   const weekStores = [...new Set([...weekOut.map(r=>r.store), ...weekWx.map(r=>r.store), ...weekQw.map(r=>r.store)])].filter(s => s !== '--' && s !== '未分组').length;
   const weekPerCapDur = weekActive > 0 ? weekTotalDur / weekActive : 0;
@@ -842,7 +849,7 @@ async function generate() {
     {v:weekWxTotal, c:PALETTE[6], l:'当周个微加微'},
     {v:`${weekInTotal}通`, c:PALETTE[7], l:'当周呼入'},
     {v:weekActive, c:PALETTE[8], l:'活跃员工'},
-    {v:weekStores, c:PALETTE[9], l:'活跃门店'},
+    {v:weekUniquePhones, c:PALETTE[9], l:'联系客户数'},
   ];
   weekKpiData.forEach((k, i) => {
     const c = wsWeek.getRow(4).getCell(i+1);
@@ -855,14 +862,14 @@ async function generate() {
     c.alignment = centerAlign;
   });
 
-  // 分类表头 (行7)
+  // 分类表头 (行7): 基本信息 | 外呼(8) | 接听(3) | 联系客户(1) | 个微(2) | 企微(2) | 沟通(2)
   wsWeek.mergeCells(7, 2, 7, 9);
   wsWeek.mergeCells(7, 10, 7, 12);
-  wsWeek.mergeCells(7, 13, 7, 14);
-  wsWeek.mergeCells(7, 15, 7, 16);
-  wsWeek.mergeCells(7, 17, 7, 18);
+  wsWeek.mergeCells(7, 14, 7, 15);
+  wsWeek.mergeCells(7, 16, 7, 17);
+  wsWeek.mergeCells(7, 18, 7, 19);
   [{col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:10, v:'工作手机接听情况'},
-   {col:13, v:'个微加微情况'},{col:15, v:'企微加微情况'},{col:17, v:'沟通时长统计'}].forEach(ch => {
+   {col:13, v:'联系客户'},{col:14, v:'个微加微情况'},{col:16, v:'企微加微情况'},{col:18, v:'沟通时长统计'}].forEach(ch => {
     const c = wsWeek.getRow(7).getCell(ch.col);
     c.value = ch.v; c.font = catFont; c.fill = catFill; c.alignment = centerAlign;
     c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
@@ -877,7 +884,7 @@ async function generate() {
   wsWeek.getRow(8).getCell(1).font = hdrFont; wsWeek.getRow(8).getCell(1).fill = hdrFill;
   wsWeek.getRow(8).getCell(1).alignment = centerAlign;
   wsWeek.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
-  const weekDetHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','个微好友','当周个微','企微好友','当周企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
+  const weekDetHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','联系客户数','个微好友','当周个微','企微好友','当周企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
   for (let i = 1; i < weekDetHdrs.length; i++) {
     const c = wsWeek.getRow(8).getCell(i+1);
     c.value = weekDetHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
@@ -892,6 +899,7 @@ async function generate() {
   visibleStores.forEach(st => {
     const stWeek = weekRecords.filter(r => r.store === st);
     const stEmps = [...new Set(stWeek.map(r => r.emp))].sort();
+    const stUniquePhones = [...new Set(stWeek.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
 
     wsWeek.mergeCells(row, 1, row, NCOLS);
     wsWeek.getCell(`A${row}`).value = st;
@@ -920,6 +928,7 @@ async function generate() {
       const inRate = inCalls > 0 ? inConn/inCalls : 0;
       const outDur = out.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
       const totalDur = ed.filter(r => r.conn).reduce((s,r)=>s+r.durSec,0)/60;
+      const uniquePhones = [...new Set(ed.map(r=>r.phone).filter(p=>p&&p!=='--'))].length;
       const wxc = weekWx.filter(r => r.emp === emp).length;
       const wxcTotal = wxRecords.filter(r => r.emp === emp).length;
       const qwc = weekQw.filter(r => r.emp === emp).length;
@@ -930,7 +939,7 @@ async function generate() {
       stWx+=wxcTotal; stWeekWx+=wxc; stQw+=qwcTotal; stWeekQw+=qwc; stOutDur+=outDur; stTotalDur+=totalDur;
 
       const vals = [emp, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
-        outDeep, inCalls, inConn, inRate, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
+        outDeep, inCalls, inConn, inRate, uniquePhones, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
       vals.forEach((v, i) => {
         const cell = wsWeek.getRow(row).getCell(i+1);
         const isPct = [5,7,11].includes(i);
@@ -949,7 +958,7 @@ async function generate() {
       const qwc = weekQw.filter(r => r.emp === emp).length;
       const qwcTotal = qwRecords.filter(r => r.emp === emp).length;
       stWx+=wxcTotal; stWeekWx+=wxc; stQw+=qwcTotal; stWeekQw+=qwc;
-      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
+      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
       vals.forEach((v, i) => {
         const cell = wsWeek.getRow(row).getCell(i+1);
         setBodyCell(cell, v, bodyFont, null, [5,7,11].includes(i)?pctFmt:null);
@@ -967,7 +976,7 @@ async function generate() {
     const stAvgDur = stOutAvgDurCount > 0 ? stOutAvgDurSum / stOutAvgDurCount : 0;
     wkAllOutAvgDurSum += stOutAvgDurSum; wkAllOutAvgDurCount += stOutAvgDurCount;
     const stVals = ['门店合计', stOut, stReturn, stNew, stOutConn, stOutRate, stOutOver30, stOutOver30Rate,
-      stOutDeep, stIn, stInConn, stInRate, stWx, stWeekWx, stQw, stWeekQw, stAvgDur, stTotalDur];
+      stOutDeep, stIn, stInConn, stInRate, stUniquePhones, stWx, stWeekWx, stQw, stWeekQw, stAvgDur, stTotalDur];
     const boldFont = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
     stVals.forEach((v, i) => {
       const cell = wsWeek.getRow(row).getCell(i+1);
@@ -983,13 +992,13 @@ async function generate() {
   const wkAllAvgDur = wkAllOutAvgDurCount > 0 ? wkAllOutAvgDurSum / wkAllOutAvgDurCount : 0;
   const weekGrandVals = ['全店', weekOutTotal, weekReturnCust, weekNewCust, weekOutConn, weekOutRate,
     weekOutOver30, weekOutOver30Rate, weekOutOver3min, weekInTotal, weekInConn, weekInRate,
-    wxRecords.length, weekWxTotal, qwRecords.length, weekQwTotal, wkAllAvgDur, weekTotalDur];
+    weekUniquePhones, wxRecords.length, weekWxTotal, qwRecords.length, weekQwTotal, wkAllAvgDur, weekTotalDur];
   weekGrandVals.forEach((v, i) => {
     const cell = wsWeek.getRow(row).getCell(i+1);
     setBodyCell(cell, [5,7,11].includes(i) ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont2, altFill, [5,7,11].includes(i)?pctFmt:null);
   });
 
-  wsWeek.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
+  wsWeek.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
   updateProgress(75);
 
   // =================== Sheet 4: 数据概览 ===================
@@ -1001,9 +1010,9 @@ async function generate() {
   ws3.getCell('A2').font = smallFont;
 
   const kpi3Vals = [totalOut, totalOutConn, totalOutRate, Math.round(avgDaily),
-    visibleStores.length, callEmps.length, Math.round(totalOutDur/callEmps.length*10)/10, weekQwTotal, weekWxTotal, totalIn];
-  const kpi3Labels = ['外呼触达总量','外呼成功接通','外呼接通率','日均客户覆盖','活跃门店数','活跃员工数','人均通话时长','当周企微加微','当周个微加微','全量呼入总量'];
-  const kpi3Descs = ['通外呼触达','通有效通话','接通数/外呼数','通/天','家门店在运营','人使用系统','分钟/人',`${weekStartStr}~${weekEndStr}`,`${weekStartStr}~${weekEndStr}`,'通呼入来电'];
+    totalUniquePhones, callEmps.length, Math.round(totalOutDur/callEmps.length*10)/10, weekQwTotal, weekWxTotal, totalIn];
+  const kpi3Labels = ['外呼触达总量','外呼成功接通','外呼接通率','日均客户覆盖','联系客户数','活跃员工数','人均通话时长','当周企微加微','当周个微加微','全量呼入总量'];
+  const kpi3Descs = ['通外呼触达','通有效通话','接通数/外呼数','通/天','位去重客户','人使用系统','分钟/人',`${weekStartStr}~${weekEndStr}`,`${weekStartStr}~${weekEndStr}`,'通呼入来电'];
 
   kpi3Vals.forEach((v, i) => {
     const c = ws3.getRow(4).getCell(i+1);
