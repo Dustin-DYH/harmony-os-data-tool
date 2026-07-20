@@ -10,8 +10,8 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;background:#f0f4f8;color:#333;min-height:100vh}
-.header{background:#F3F9FF;color:#0f3460;padding:24px 16px;display:flex;align-items:center;gap:16px}
-.header h1{font-size:24px;font-weight:700;letter-spacing:2px;color:#0f3460;flex:1;text-align:center}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#fff;padding:24px 0;text-align:center}
+.header h1{font-size:24px;font-weight:700;letter-spacing:2px}
 .header .sub{font-size:12px;opacity:0.7;margin-top:6px;letter-spacing:1px}
 .container{max-width:960px;margin:0 auto;padding:20px}
 .card{background:#fff;border-radius:10px;padding:24px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
@@ -84,18 +84,13 @@ input:focus{outline:none;border-color:#0f3460}
 .dash-tbl tr:nth-child(even) td{background:#fafbfc}
 .dash-date-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .dash-date-row .sep{color:#999;font-size:12px}
-.hint-wrap{display:inline-flex;align-items:center;gap:2px}
-.hint-icon{display:inline-flex;align-items:center;justify-content:center;width:11px;height:11px;border-radius:50%;background:#b0bec5;color:#fff;font-size:7px;font-weight:700;cursor:help;line-height:1;flex-shrink:0}
-.hint-icon:hover{background:#4a9eff}
-.hint-tip-fixed{position:fixed;background:#1a1a2e;color:#fff;font-size:11px;padding:6px 10px;border-radius:6px;z-index:99999;pointer-events:none;max-width:260px;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.2);white-space:normal}
-.hint-tip-fixed::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a2e}
 @media(max-width:1200px){.dash-r2{grid-template-columns:1fr}.dash-kp{grid-template-columns:repeat(3,1fr)}}</style>
 </head>
 <body>
 <div class="header">
-  <img src="data:image/png;base64,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" alt="logo" style="width:112px;max-height:33px">
-  <h1>车企定制化数据分析工具 <span class="badge">beta v1.5</span></h1>
-  </div>
+  <h1>车企定制化数据分析工具 <span class="badge">beta v1.4</span></h1>
+  <div class="sub">上传通话记录 + 个微客户数据 + 企微客户数据，生成标准化效能分析报告</div>
+</div>
 
 <div class="container">
   <div class="card">
@@ -142,17 +137,7 @@ input:focus{outline:none;border-color:#0f3460}
         <input type="date" id="reportDate">
       </div>
     </div>
-    <div class="row" style="margin-top:12px">
-      <div class="col">
-        <label>趋势起始日期</label>
-        <input type="date" id="trendStart">
-      </div>
-      <div class="col">
-        <label>趋势结束日期</label>
-        <input type="date" id="trendEnd">
-      </div>
-    </div>
-    <div class="note" style="margin-top:8px">趋势范围最大60天，看板与导出报表的趋势数据将按此范围展示</div>
+    <div class="note" style="margin-top:8px">日报日期自动确定所在周范围(KW周号)，趋势和效能分析基于全量数据</div>
   </div>
 
   <div class="card">
@@ -192,108 +177,6 @@ input:focus{outline:none;border-color:#0f3460}
 // ===================== 全局状态 =====================
 let callData = null, wxData = null, qwData = null, resultBlob = null, dashboardData = null;
 let callFields = {}, wxFields = {}, qwFields = {};
-
-// ===================== 字段提示定义 =====================
-const TREND_HINTS = {
-  '外呼量':'当日该门店呼出通话总次数',
-  '老客跟进':'此前已有通话记录的老客户再次外呼的数量',
-  '新客外呼':'首次出现（无历史通话记录）的客户外呼数量',
-  '接通量':'外呼成功接通的数量（排除未接通、未接等状态）',
-  '接通率':'接通量 ÷ 外呼量 × 100%',
-  '≥30s通话':'接通且通话时长≥30秒的通话数量',
-  '≥30s通话率':'≥30s通话数 ÷ 接通量 × 100%',
-  '≥3min深沟通':'接通且通话时长≥3分钟的通话数量',
-  '平均接通时长':'接通通话的总时长 ÷ 接通量，单位：分钟',
-  '呼入量':'当日该门店客户呼入总次数',
-  '呼入接通':'呼入中成功接通的数量',
-  '呼入接通率':'呼入接通 ÷ 呼入量 × 100%',
-  '联系客户数':'呼出 + 呼入的去重手机号数量',
-  '个微添数':'当日该门店员工通过个人微信添加的客户数',
-  '企微添数':'当日该门店员工通过企业微信添加的客户数',
-  '通话总时长':'该门店当日所有接通通话的总时长，单位：分钟',
-  '人均时长':'通话总时长 ÷ 当日该门店活跃员工数，单位：分钟',
-};
-const PERSONNEL_HINTS = {
-  '外呼量':'该员工当日呼出通话总次数',
-  '老客跟进':'该员工外呼中属于老客户的数量',
-  '新客外呼':'该员工外呼中属于新客户的数量',
-  '接通量':'该员工外呼成功接通的数量',
-  '接通率':'接通量 ÷ 外呼量 × 100%',
-  '≥30s通话':'接通且通话时长≥30秒的数量',
-  '≥30s通话率':'≥30s通话数 ÷ 接通量 × 100%',
-  '≥3min深沟通':'接通且通话时长≥3分钟的数量',
-  '呼入量':'该员工当日客户呼入总次数',
-  '呼入接通':'呼入中成功接通的数量',
-  '呼入接通率':'呼入接通 ÷ 呼入量 × 100%',
-  '联系客户数':'该员工呼出 + 呼入的去重手机号数量',
-  '个微好友':'该员工累计个人微信好友数',
-  '当日个微':'该员工当日新增个人微信好友数',
-  '企微好友':'该员工累计企业微信好友数',
-  '当日企微':'该员工当日新增企业微信好友数',
-  '平均接通时长':'该员工接通通话总时长 ÷ 接通量，单位：分钟',
-  '通话总时长':'该员工当日所有接通通话总时长，单位：分钟',
-};
-function thHint(label, hints) {
-  var h = hints[label];
-  if (!h) return '<th>' + label + '</th>';
-  return '<th><span class="hint-wrap">' + label + '<span class="hint-icon" onmouseenter="showHint(this,\'' + h.replace(/'/g,"\\'") + '\')" onmouseleave="hideHint(this)">?</span></span></th>';
-}
-function showHint(el, text) {
-  var tip = document.createElement('div');
-  tip.className = 'hint-tip-fixed';
-  tip.textContent = text;
-  document.body.appendChild(tip);
-  var rect = el.getBoundingClientRect();
-  tip.style.left = (rect.left + rect.width/2) + 'px';
-  tip.style.top = (rect.top - 8) + 'px';
-  tip.style.transform = 'translate(-50%, -100%)';
-  el._hintTip = tip;
-}
-function hideHint(el) {
-  if (el._hintTip) { el._hintTip.remove(); el._hintTip = null; }
-}
-
-// ===================== 模块标题提示定义 =====================
-var SECTION_HINTS = {
-  '筛选条件':'指定图表和导出报告所呈现的数据范围',
-  '外呼量趋势':'各员工每日外呼量趋势对比',
-  '外呼接通率趋势':'各员工每日外呼接通率（接通量÷外呼量）趋势对比',
-  '外呼接通时长趋势（分钟）':'各门店每日平均外呼接通时长趋势对比',
-  '≥30s有效外呼趋势':'各员工每日≥30秒有效通话量趋势对比',
-  '人员加微情况趋势':'各员工每日企微+个微新增客户数趋势对比',
-  '通话总时长趋势（分钟）':'各员工每日通话总时长趋势对比',
-  '客户转化漏斗':'当日外呼→有效接通→≥30s→深沟通→加微的转化漏斗',
-  '趋势图日期筛选':'筛选下方趋势图表和门店数据趋势列表的日期范围',
-  '每日外呼/接通趋势':'所选门店每日外呼量与接通量趋势对比',
-  '企微&个微日新增':'所选门店每日企微和个微新增客户数',
-  '老客跟进数趋势':'所选门店每日老客户跟进量趋势',
-  '新客外呼数趋势':'所选门店每日新客户外呼量趋势',
-  '≥30秒通话趋势':'所选门店每日≥30秒有效通话量趋势',
-  '平均外呼接通时长趋势':'所选门店每日平均外呼接通时长（接通总时长÷接通量）趋势',
-  '门店数据趋势列表':'所选门店和日期范围的运营数据明细表',
-  '数据模式':'日报：显示单日数据；按时间范围选择：显示指定日期范围的汇总数据',
-  '人员外呼情况':'各员工外呼量、接通量、接通率对比',
-  '外呼接通时长（分钟）':'各员工平均外呼接通时长对比',
-  '≥30s有效外呼':'各员工≥30秒有效通话量对比',
-  '人员呼入接通情况':'各员工呼入量、接通量、接通率对比',
-  '人员加微情况':'各员工企微和个微加微情况对比',
-  '通话总时长（分钟）':'各员工使用工作手机完成的呼入、呼出总接听时长',
-  '人员运营效能总览':'各员工运营效能数据明细表',
-  '门店外呼趋势':'所选门店每日外呼量与接通率趋势',
-  '门店接通率趋势':'所选门店每日外呼接通率趋势',
-  '企/微新增量趋势':'所选门店每日企微和个微新增客户数趋势',
-  '企/个微新增量趋势':'所选门店每日企微和个微新增客户数趋势',
-};
-function ptHint(title) {
-  var h = SECTION_HINTS[title];
-  if (!h) return '<div class="dash-pt">' + title + '</div>';
-  return '<div class="dash-pt"><span class="hint-wrap">' + title + '<span class="hint-icon" onmouseenter="showHint(this,\'' + h.replace(/'/g,"\\'") + '\')" onmouseleave="hideHint(this)">?</span></span></div>';
-}
-function ptHintSpan(title) {
-  var h = SECTION_HINTS[title];
-  if (!h) return '';
-  return ' <span class="hint-icon" onmouseenter="showHint(this,\'' + h.replace(/'/g,"\\'") + '\')" onmouseleave="hideHint(this)">?</span>';
-}
 
 // ===================== 字段自动识别 =====================
 const CALL_PATTERNS = {
@@ -580,14 +463,6 @@ async function generate() {
   const nDays = allDates.length;
   const fullStart = allDates[0], fullEnd = allDates[allDates.length - 1];
 
-  // 趋势范围（首页选择器）
-  const tsVal = document.getElementById('trendStart').value;
-  const teVal = document.getElementById('trendEnd').value;
-  const trendStart = tsVal || allDates[0];
-  const trendEnd = teVal || allDates[allDates.length - 1];
-  const trendDays = (new Date(trendEnd + 'T00:00:00') - new Date(trendStart + 'T00:00:00')) / 86400000;
-  if (trendDays > 60) return showStatus('error', '趋势日期范围最大60天');
-
   const stores = [...new Set(callRecords.map(r => r.store))];
   stores.sort((a,b) => callRecords.filter(r=>r.store===b).length - callRecords.filter(r=>r.store===a).length);
   // 隐藏无外呼无加微的门店
@@ -657,7 +532,7 @@ async function generate() {
   // ===================== 构建 Excel =====================
   const ExcelJS = window.ExcelJS;
   const wb = new ExcelJS.Workbook();
-  wb.creator = '车企定制化数据分析工具 beta v1.5';
+  wb.creator = '车企定制化数据分析工具 beta v1.4';
 
   const DARK_BLUE = '0f3460';
   const ACCENT_RED = 'e94560';
@@ -772,7 +647,7 @@ async function generate() {
   ws1.getRow(8).getCell(1).value = '员工'; ws1.getRow(8).getCell(1).font = hdrFont; ws1.getRow(8).getCell(1).fill = hdrFill; ws1.getRow(8).getCell(1).alignment = centerAlign; ws1.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
 
   // 列标题 (行8)
-  const detHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','≥3min深沟通','呼入量','接通量','接通率','联系客户数','个微好友','当日个微','企微好友','当日企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
+  const detHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','联系客户数','个微好友','当日个微','企微好友','当日企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
   for (let i = 1; i < detHdrs.length; i++) {
     const c = ws1.getRow(8).getCell(i+1);
     c.value = detHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
@@ -888,168 +763,7 @@ async function generate() {
   });
 
   ws1.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,10,11,10,10,11,12,12].map(w => ({width:w}));
-  updateProgress(55);
-
-  // =================== Sheet 1.5: 时间范围筛选的员工报表 ===================
-  const wsRange = wb.addWorksheet('时间范围筛选的员工报表');
-  wsRange.mergeCells(1, 1, 1, NCOLS);
-  wsRange.getCell('A1').value = `时间范围筛选的员工报表（${trendStart}~${trendEnd}）`;
-  wsRange.getCell('A1').font = titleFont;
-  wsRange.getCell('A1').alignment = centerAlign;
-  wsRange.mergeCells(2, 1, 2, NCOLS);
-  wsRange.getCell('A2').value = `生成: ${todayStr} | 趋势范围: ${trendStart}~${trendEnd}（${Math.round(trendDays)+1}天）`;
-  wsRange.getCell('A2').font = smallFont;
-
-  // 分类表头
-  wsRange.mergeCells(7, 2, 7, 9);
-  wsRange.mergeCells(7, 10, 7, 12);
-  wsRange.mergeCells(7, 14, 7, 15);
-  wsRange.mergeCells(7, 16, 7, 17);
-  wsRange.mergeCells(7, 18, 7, 19);
-  [{col:1, v:'基本信息'},{col:2, v:'工作手机外呼情况'},{col:10, v:'工作手机接听情况'},
-   {col:13, v:'联系客户'},{col:14, v:'个微加微情况'},{col:16, v:'企微加微情况'},{col:18, v:'沟通时长统计'}].forEach(function(ch) {
-    const c = wsRange.getRow(7).getCell(ch.col);
-    c.value = ch.v; c.font = catFont; c.fill = catFill; c.alignment = centerAlign;
-    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
-  });
-  for (let i = 1; i <= NCOLS; i++) {
-    const c = wsRange.getRow(7).getCell(i);
-    if (!c.value) { c.fill = catFill; c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder }; }
-  }
-  wsRange.getRow(8).getCell(1).value = '员工';
-  wsRange.getRow(8).getCell(1).font = hdrFont; wsRange.getRow(8).getCell(1).fill = hdrFill; wsRange.getRow(8).getCell(1).alignment = centerAlign;
-  wsRange.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
-  for (let i = 1; i < detHdrs.length; i++) {
-    const c = wsRange.getRow(8).getCell(i+1);
-    c.value = detHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
-    c.border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
-  }
-  wsRange.views = [{state:'frozen', ySplit:8}];
-
-  // 趋势范围内的记录
-  const rangeRecords = callRecords.filter(function(r) { return r.date >= trendStart && r.date <= trendEnd; });
-  const rangeWx = wxRecords.filter(function(r) { return r.date && r.date >= trendStart && r.date <= trendEnd; });
-  const rangeQw = qwRecords.filter(function(r) { return r.date && r.date >= trendStart && r.date <= trendEnd; });
-  const rangeUniquePhones = [...new Set(rangeRecords.map(function(r) { return r.phone; }).filter(function(p) { return p && p !== '--'; }))].length;
-
-  let rrow = 9;
-  let rangeAllOutAvgDurSum = 0, rangeAllOutAvgDurCount = 0;
-  visibleStores.forEach(function(st) {
-    const stRecs = rangeRecords.filter(function(r) { return r.store === st; });
-    const stEmps = [...new Set(stRecs.map(function(r) { return r.emp; }))].sort();
-    const stUniquePhones = [...new Set(stRecs.map(function(r) { return r.phone; }).filter(function(p) { return p && p !== '--'; }))].length;
-
-    wsRange.mergeCells(rrow, 1, rrow, NCOLS);
-    wsRange.getCell('A' + rrow).value = st;
-    wsRange.getCell('A' + rrow).font = subFont;
-    rrow++;
-
-    const rsStart = rrow;
-    let stOut=0, stOutConn=0, stOutOver30=0, stOutDeep=0, stNew=0, stReturn=0;
-    let stIn=0, stInConn=0, stWx=0, stRangeWx=0, stQw=0, stRangeQw=0, stOutDur=0, stTotalDur=0;
-    let stOutAvgDurSum=0, stOutAvgDurCount=0;
-
-    stEmps.forEach(function(emp) {
-      const ed = stRecs.filter(function(r) { return r.emp === emp; });
-      const out = ed.filter(function(r) { return r.outbound; });
-      const inn = ed.filter(function(r) { return !r.outbound; });
-      const outCalls = out.length, outConn = out.filter(function(r) { return r.conn; }).length;
-      const outRate = outCalls > 0 ? outConn/outCalls : 0;
-      const outOver30 = out.filter(function(r) { return r.over30s; }).length;
-      const outOver30Rate = outConn > 0 ? outOver30/outConn : 0;
-      const outDeep = out.filter(function(r) { return r.over3min; }).length;
-      const outAvgDur = outConn > 0 ? out.filter(function(r) { return r.conn; }).reduce(function(s,r) { return s + r.durSec; }, 0)/60/outConn : 0;
-      if (outConn > 0) { stOutAvgDurSum += outAvgDur; stOutAvgDurCount++; }
-      const outNew = out.filter(function(r) { return r.isNewCustomer; }).length;
-      const outReturn = out.filter(function(r) { return r.isReturning; }).length;
-      const inCalls = inn.length, inConn = inn.filter(function(r) { return r.conn; }).length;
-      const inRate = inCalls > 0 ? inConn/inCalls : 0;
-      const outDur = out.filter(function(r) { return r.conn; }).reduce(function(s,r) { return s + r.durSec; }, 0)/60;
-      const totalDur = ed.filter(function(r) { return r.conn; }).reduce(function(s,r) { return s + r.durSec; }, 0)/60;
-      const uniquePhones = [...new Set(ed.map(function(r) { return r.phone; }).filter(function(p) { return p && p !== '--'; }))].length;
-      const wxc = rangeWx.filter(function(r) { return r.emp === emp; }).length;
-      const wxcTotal = wxRecords.filter(function(r) { return r.emp === emp; }).length;
-      const qwc = rangeQw.filter(function(r) { return r.emp === emp; }).length;
-      const qwcTotal = qwRecords.filter(function(r) { return r.emp === emp; }).length;
-
-      stOut+=outCalls; stOutConn+=outConn; stOutOver30+=outOver30; stOutDeep+=outDeep;
-      stNew+=outNew; stReturn+=outReturn; stIn+=inCalls; stInConn+=inConn;
-      stWx+=wxcTotal; stRangeWx+=wxc; stQw+=qwcTotal; stRangeQw+=qwc; stOutDur+=outDur; stTotalDur+=totalDur;
-
-      const vals = [emp, outCalls, outReturn, outNew, outConn, outRate, outOver30, outOver30Rate,
-        outDeep, inCalls, inConn, inRate, uniquePhones, wxcTotal, wxc, qwcTotal, qwc, outAvgDur, totalDur];
-      vals.forEach(function(v, i) {
-        const cell = wsRange.getRow(rrow).getCell(i+1);
-        const isPct = [5,7,11].indexOf(i) >= 0;
-        setBodyCell(cell, isPct ? Math.round(v*1e4)/1e4 : (typeof v === 'number' ? Math.round(v*10)/10 : v), bodyFont, null, isPct ? pctFmt : null);
-      });
-      rrow++;
-    });
-
-    // 仅微信员工
-    const wxOnly = [...new Set([...wxEmps, ...qwEmps])].filter(function(e) { return !callEmps.includes(e); });
-    wxOnly.forEach(function(emp) {
-      const empStore = (wxRecords.find(function(r) { return r.emp === emp; }) || qwRecords.find(function(r) { return r.emp === emp; }) || {}).store;
-      if (empStore !== st) return;
-      const wxc = rangeWx.filter(function(r) { return r.emp === emp; }).length;
-      const wxcTotal = wxRecords.filter(function(r) { return r.emp === emp; }).length;
-      const qwc = rangeQw.filter(function(r) { return r.emp === emp; }).length;
-      const qwcTotal = qwRecords.filter(function(r) { return r.emp === emp; }).length;
-      stWx+=wxcTotal; stRangeWx+=wxc; stQw+=qwcTotal; stRangeQw+=qwc;
-      const vals = [emp, 0,0,0,0,0,0,0,0,0,0,0,0, wxcTotal,wxc, qwcTotal,qwc, 0,0];
-      vals.forEach(function(v, i) {
-        const cell = wsRange.getRow(rrow).getCell(i+1);
-        setBodyCell(cell, v, bodyFont, null, [5,7,11].indexOf(i) >= 0 ? pctFmt : null);
-      });
-      rrow++;
-    });
-
-    const rsEnd = rrow - 1;
-    altRow(wsRange, rsStart, rsEnd, NCOLS);
-
-    const stOutRate = stOut > 0 ? stOutConn/stOut : 0;
-    const stOutOver30Rate = stOutConn > 0 ? stOutOver30/stOutConn : 0;
-    const stInRate = stIn > 0 ? stInConn/stIn : 0;
-    const stAvgDur = stOutAvgDurCount > 0 ? stOutAvgDurSum / stOutAvgDurCount : 0;
-    rangeAllOutAvgDurSum += stOutAvgDurSum; rangeAllOutAvgDurCount += stOutAvgDurCount;
-    const stVals = ['门店合计', stOut, stReturn, stNew, stOutConn, stOutRate, stOutOver30, stOutOver30Rate,
-      stOutDeep, stIn, stInConn, stInRate, stUniquePhones, stWx, stRangeWx, stQw, stRangeQw, stAvgDur, stTotalDur];
-    const boldFont = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
-    stVals.forEach(function(v, i) {
-      const cell = wsRange.getRow(rrow).getCell(i+1);
-      setBodyCell(cell, [5,7,11].indexOf(i) >= 0 ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont, altFill, [5,7,11].indexOf(i) >= 0 ? pctFmt : null);
-    });
-    rrow += 2;
-  });
-
-  // 全店合计
-  wsRange.mergeCells(rrow, 1, rrow, NCOLS);
-  wsRange.getCell('A' + rrow).value = '全店合计'; wsRange.getCell('A' + rrow).font = subFont;
-  rrow++;
-  const rangeAllAvgDur = rangeAllOutAvgDurCount > 0 ? rangeAllOutAvgDurSum / rangeAllOutAvgDurCount : 0;
-  const rangeOutTotal = rangeRecords.filter(function(r) { return r.outbound; }).length;
-  const rangeOutConn = rangeRecords.filter(function(r) { return r.outbound && r.conn; }).length;
-  const rangeOutRate = rangeOutTotal > 0 ? rangeOutConn / rangeOutTotal : 0;
-  const rangeOutOver30 = rangeRecords.filter(function(r) { return r.outbound && r.over30s; }).length;
-  const rangeOutOver30Rate = rangeOutConn > 0 ? rangeOutOver30 / rangeOutConn : 0;
-  const rangeOutOver3min = rangeRecords.filter(function(r) { return r.outbound && r.over3min; }).length;
-  const rangeOutNew = rangeRecords.filter(function(r) { return r.outbound && r.isNewCustomer; }).length;
-  const rangeOutReturn = rangeRecords.filter(function(r) { return r.outbound && r.isReturning; }).length;
-  const rangeInTotal = rangeRecords.filter(function(r) { return !r.outbound; }).length;
-  const rangeInConn = rangeRecords.filter(function(r) { return !r.outbound && r.conn; }).length;
-  const rangeInRate = rangeInTotal > 0 ? rangeInConn / rangeInTotal : 0;
-  const rangeTotalDur = rangeRecords.filter(function(r) { return r.conn; }).reduce(function(s,r) { return s + r.durSec; }, 0) / 60;
-  const rangeWxTotal = rangeWx.length;
-  const rangeQwTotal = rangeQw.length;
-  const rangeGrandVals = ['全店', rangeOutTotal, rangeOutReturn, rangeOutNew, rangeOutConn, rangeOutRate,
-    rangeOutOver30, rangeOutOver30Rate, rangeOutOver3min, rangeInTotal, rangeInConn, rangeInRate,
-    rangeUniquePhones, wxRecords.length, rangeWxTotal, qwRecords.length, rangeQwTotal, rangeAllAvgDur, rangeTotalDur];
-  rangeGrandVals.forEach(function(v, i) {
-    const cell = wsRange.getRow(rrow).getCell(i+1);
-    setBodyCell(cell, [5,7,11].indexOf(i) >= 0 ? Math.round(v*1e4)/1e4 : (typeof v==='number'?Math.round(v*10)/10:v), boldFont2, altFill, [5,7,11].indexOf(i) >= 0 ? pctFmt : null);
-  });
-  wsRange.columns = [14,10,10,10,10,10,10,11,10,11,10,10,10,10,11,10,10,11,12,12].map(function(w) { return {width:w}; });
-  updateProgress(68);
+  updateProgress(60);
 
   // =================== Sheet 2: 日度趋势 ===================
   const ws2 = wb.addWorksheet('工作手机日度趋势统计');
@@ -1058,7 +772,7 @@ async function generate() {
   ws2.getCell('A1').value = '工作手机日度趋势统计'; ws2.getCell('A1').font = titleFont;
   ws2.getCell('A1').alignment = centerAlign;
   ws2.mergeCells(2, 1, 2, NCOLS2);
-  ws2.getCell('A2').value = `趋势范围汇总（${trendStart}~${trendEnd}，${Math.round(trendDays)+1}天·${visibleStores.length}店）| 生成: ${todayStr}`;
+  ws2.getCell('A2').value = `全量日报汇总（${fullStart}~${fullEnd}，${nDays}天·${visibleStores.length}店）| 生成: ${todayStr}`;
   ws2.getCell('A2').font = smallFont;
 
   // 分类表头 (行4): 基本信息 | 外呼(9) | 接听(3) | 联系客户(1) | 加微(2) | 沟通(2)
@@ -1085,7 +799,7 @@ async function generate() {
   ws2.getRow(5).getCell(1).font = hdrFont; ws2.getRow(5).getCell(1).fill = hdrFill; ws2.getRow(5).getCell(1).alignment = centerAlign;
   ws2.getRow(5).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
 
-  const trendHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','≥3min深沟通','平均外呼接通时长','呼入量','呼入接通量','呼入接通率','联系客户数','个微添数','企微添数','通话总时长','人均时长'];
+  const trendHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','平均外呼接通时长','呼入量','呼入接通量','呼入接通率','联系客户数','个微添数','企微添数','通话总时长','人均时长'];
   for (let i = 1; i < trendHdrs.length; i++) {
     const c = ws2.getRow(5).getCell(i+1);
     c.value = trendHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
@@ -1097,8 +811,7 @@ async function generate() {
   let totalWxAdd = 0, totalQwAdd = 0;
   let sumTotalDur = 0, sumOutAvgDur = 0, countOutAvgDur = 0, sumPerCapDur = 0, countPerCapDur = 0;
   let sumUniquePhones = 0;
-  const trendDates = allDates.filter(function(d) { return d >= trendStart && d <= trendEnd; });
-  trendDates.forEach(d => {
+  allDates.forEach(d => {
     const dd = callRecords.filter(r => r.date === d);
     const dOut = dd.filter(r => r.outbound);
     const dIn = dd.filter(r => !r.outbound);
@@ -1140,29 +853,16 @@ async function generate() {
   const r2End = row - 1;
   altRow(ws2, r2Start, r2End, NCOLS2);
 
-  // 合计行（趋势范围内）
-  const trendRecs = callRecords.filter(function(r) { return r.date >= trendStart && r.date <= trendEnd; });
-  const trendOut = trendRecs.filter(function(r) { return r.outbound; });
-  const trendOutTotal = trendOut.length;
-  const trendOutConn = trendOut.filter(function(r) { return r.conn; }).length;
-  const trendOutRate = trendOutTotal > 0 ? trendOutConn / trendOutTotal : 0;
-  const trendOutOver30 = trendOut.filter(function(r) { return r.over30s; }).length;
-  const trendOutOver30Rate = trendOutConn > 0 ? trendOutOver30 / trendOutConn : 0;
-  const trendOutOver3min = trendOut.filter(function(r) { return r.over3min; }).length;
-  const trendNewCust = trendOut.filter(function(r) { return r.isNewCustomer; }).length;
-  const trendReturnCust = trendOut.filter(function(r) { return r.isReturning; }).length;
-  const trendIn = trendRecs.filter(function(r) { return !r.outbound; });
-  const trendInTotal = trendIn.length;
-  const trendInConn = trendIn.filter(function(r) { return r.conn; }).length;
-  const trendInRate = trendInTotal > 0 ? trendInConn / trendInTotal : 0;
+  // 合计行
   ws2.getRow(row).getCell(1).value = '合计';
   ws2.getRow(row).getCell(1).font = {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}};
-  const totalOutOver30Rate = trendOutConn > 0 ? trendOutOver30 / trendOutConn : 0;
+  const totalOutOver30Rate = totalOutConn > 0 ? callRecords.filter(r=>r.outbound&&r.over30s).length/totalOutConn : 0;
   const totalOutAvgDur = countOutAvgDur > 0 ? sumOutAvgDur / countOutAvgDur : 0;
   const totalPerCapDur = countPerCapDur > 0 ? sumPerCapDur / countPerCapDur : 0;
-  const sumVals = ['合计', trendOutTotal, trendReturnCust, trendNewCust, trendOutConn, trendOutRate,
-    trendOutOver30, totalOutOver30Rate, trendOutOver3min, totalOutAvgDur,
-    trendInTotal, trendInConn, trendInRate, sumUniquePhones, totalWxAdd, totalQwAdd, sumTotalDur, totalPerCapDur];
+  const sumVals = ['合计', totalOut, totalReturnCust, totalNewCust, totalOutConn, totalOutRate,
+    callRecords.filter(r=>r.outbound&&r.over30s).length, totalOutOver30Rate,
+    callRecords.filter(r=>r.outbound&&r.over3min).length, totalOutAvgDur,
+    totalIn, totalInConn, totalInRate, sumUniquePhones, totalWxAdd, totalQwAdd, sumTotalDur, totalPerCapDur];
   sumVals.forEach((v, i) => {
     const cell = ws2.getRow(row).getCell(i+1);
     const isPct = [5,7,12].includes(i);
@@ -1171,7 +871,7 @@ async function generate() {
 
   ws2.views = [{state:'frozen', ySplit:5}];
   ws2.columns = [14,10,10,10,10,10,10,11,11,13,13,10,10,10,10,10,10,13,13].map(w => ({width:w}));
-  updateProgress(72);
+  updateProgress(68);
 
   // =================== Sheet 3: 周报报表 ===================
   const wsWeek = wb.addWorksheet('周报报表');
@@ -1252,7 +952,7 @@ async function generate() {
   wsWeek.getRow(8).getCell(1).font = hdrFont; wsWeek.getRow(8).getCell(1).fill = hdrFill;
   wsWeek.getRow(8).getCell(1).alignment = centerAlign;
   wsWeek.getRow(8).getCell(1).border = { top:thinBorder, bottom:thinBorder, left:thinBorder, right:thinBorder };
-  const weekDetHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','≥3min深沟通','呼入量','接通量','接通率','联系客户数','个微好友','当周个微','企微好友','当周企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
+  const weekDetHdrs = ['','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','呼入量','接通量','接通率','联系客户数','个微好友','当周个微','企微好友','当周企微','平均外呼接通时长','工作手机通话总时长（分钟）'];
   for (let i = 1; i < weekDetHdrs.length; i++) {
     const c = wsWeek.getRow(8).getCell(i+1);
     c.value = weekDetHdrs[i]; c.font = hdrFont; c.fill = hdrFill; c.alignment = centerAlign;
@@ -1450,7 +1150,7 @@ async function generate() {
   altRow(ws3, r3sStart, row, 3);
   ws3.views = [{state:'frozen', ySplit:7}];
   ws3.columns = [18,13,13,13,13,13,13,13,13,13].map(w => ({width:w}));
-  updateProgress(84);
+  updateProgress(82);
 
   // =================== Sheet 4: 门店效能 ===================
   const ws4 = wb.addWorksheet('门店效能分析');
@@ -1479,7 +1179,7 @@ async function generate() {
   });
   altRow(ws4, 5, row-1, 9);
   ws4.views = [{state:'frozen', ySplit:3}];
-  updateProgress(90);
+  updateProgress(88);
 
   // =================== Sheet 5: 员工活跃度 ===================
   const ws5 = wb.addWorksheet('员工活跃度分析');
@@ -1530,7 +1230,7 @@ async function generate() {
     row++;
   });
   ws5.views = [{state:'frozen', ySplit:3}];
-  updateProgress(94);
+  updateProgress(93);
 
   // =================== Sheet 6: 时段效率 ===================
   const ws6 = wb.addWorksheet('时段与效率分析');
@@ -1587,7 +1287,7 @@ async function generate() {
   ws6.getCell(`A${row}`).value = `> 最佳外呼时段: ${bh} | 最佳日: ${bd}`;
   ws6.getCell(`A${row}`).font = {name:'Microsoft YaHei', size:10, bold:true, color:{argb:DARK_BLUE}};
   ws6.views = [{state:'frozen', ySplit:4}];
-  updateProgress(98);
+  updateProgress(97);
 
   // =================== Sheet 7: 周度综合结论 ===================
   const ws7 = wb.addWorksheet('周度综合结论');
@@ -1649,8 +1349,7 @@ async function generate() {
     totalOut, totalOutConn, totalOutRate, totalIn, totalDur, totalOutDur, totalUniquePhones, totalNewCust, totalReturnCust, avgDaily,
     weekRecords, weekStartStr, weekEndStr, weekOutTotal, weekOutConn, weekOutRate, weekInTotal, weekTotalDur, weekQwTotal, weekWxTotal, weekUniquePhones, weekActive,
     dayOutTotal, dayOutConn, dayOutRate, dayInTotal, dayTotalDur, dayQwCount, dayWxCount, dayUniquePhones, dayActive, dayPerCapDur,
-    brand, reportDateStr, weekStartStr, weekEndStr, kw,
-    trendStart, trendEnd
+    brand, reportDateStr, weekStartStr, weekEndStr, kw
   };
   showDashboard();
 }
@@ -1754,8 +1453,11 @@ function showDashboard() {
   document.getElementById('status').style.display = 'none';
   document.getElementById('dashWrap').style.display = 'block';
   D = dashboardData;
-  dashDateStart = D.trendStart;
-  dashDateEnd = D.trendEnd;
+  // 默认近60天
+  var end60 = new Date(D.fullEnd + 'T00:00:00');
+  var start60 = new Date(end60.getTime() - 59 * 86400000);
+  dashDateStart = start60.toISOString().slice(0, 10) < D.fullStart ? D.fullStart : start60.toISOString().slice(0, 10);
+  dashDateEnd = D.fullEnd;
   initStoreFilter();
   document.getElementById('dashInfo').textContent = `${D.fullStart}~${D.fullEnd} | ${D.visibleStores.length}门店·${D.allEmps.length}员工`;
   document.getElementById('dashNav').addEventListener('click', function(e) {
@@ -1875,25 +1577,25 @@ function overviewHTML() {
     '</div>';
 
   // 当日漏斗
-  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt"><span class="hint-wrap">客户转化漏斗' + ptHintSpan('客户转化漏斗') + '</span>（' + D.reportDateStr + ' 当日数据）</div><div class="dash-ch" id="ch-funnel"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">客户转化漏斗（' + D.reportDateStr + ' 当日数据）</div><div class="dash-ch" id="ch-funnel"></div></div>';
 
   // 日期选择器
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('趋势图日期筛选');
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">趋势图日期筛选</div>';
   h += '<div class="dash-date-row"><span class="dash-date-label">起始</span><input type="date" class="dash-date-input" id="dashDs" value="' + dashDateStart + '" onchange="onDateChange()">';
   h += '<span class="sep">至</span><span class="dash-date-label">结束</span><input type="date" class="dash-date-input" id="dashDe" value="' + D.fullEnd + '" onchange="onDateChange()">';
   h += '<span style="font-size:11px;color:#999">（最大60天）</span></div></div>';
 
   // Row 1: 每日外呼/接通 + 企微&个微日新增
-  h += '<div class="dash-r2"><div class="dash-pn">' + ptHint('每日外呼/接通趋势') + '<div class="dash-ch-l" id="ch-daily"></div></div>';
-  h += '<div class="dash-pn">' + ptHint('企微&个微日新增') + '<div class="dash-ch-l" id="ch-wechat"></div></div></div>';
+  h += '<div class="dash-r2"><div class="dash-pn"><div class="dash-pt">每日外呼/接通趋势</div><div class="dash-ch-l" id="ch-daily"></div></div>';
+  h += '<div class="dash-pn"><div class="dash-pt">企微&个微日新增</div><div class="dash-ch-l" id="ch-wechat"></div></div></div>';
 
   // Row 2: 老客跟进 + 新客外呼
-  h += '<div class="dash-r2"><div class="dash-pn">' + ptHint('老客跟进数趋势') + '<div class="dash-ch" id="ch-return"></div></div>';
-  h += '<div class="dash-pn">' + ptHint('新客外呼数趋势') + '<div class="dash-ch" id="ch-newcust"></div></div></div>';
+  h += '<div class="dash-r2"><div class="dash-pn"><div class="dash-pt">老客跟进数趋势</div><div class="dash-ch" id="ch-return"></div></div>';
+  h += '<div class="dash-pn"><div class="dash-pt">新客外呼数趋势</div><div class="dash-ch" id="ch-newcust"></div></div></div>';
 
   // Row 3: ≥30s通话 + 平均外呼接通时长
-  h += '<div class="dash-r2"><div class="dash-pn">' + ptHint('≥30秒通话趋势') + '<div class="dash-ch" id="ch-over30"></div></div>';
-  h += '<div class="dash-pn">' + ptHint('平均外呼接通时长趋势') + '<div class="dash-ch" id="ch-avgdur"></div></div></div>';
+  h += '<div class="dash-r2"><div class="dash-pn"><div class="dash-pt">≥30秒通话趋势</div><div class="dash-ch" id="ch-over30"></div></div>';
+  h += '<div class="dash-pn"><div class="dash-pt">平均外呼接通时长趋势</div><div class="dash-ch" id="ch-avgdur"></div></div></div>';
 
   // 门店数据趋势列表（按日期+门店罗列）
   var filteredRecs = filterByStore(filterByDate(D.callRecords));
@@ -1908,13 +1610,13 @@ function overviewHTML() {
       if (hasData) storeDateList.push({ d: d, st: st });
     });
   });
-  h += '<div class="dash-pn" style="margin-top:12px"><div class="dash-pt"><span class="hint-wrap">门店数据趋势列表' + ptHintSpan('门店数据趋势列表') + '</span>（' + dashDateStart + '~' + dashDateEnd + '）</div>';
+  h += '<div class="dash-pn" style="margin-top:12px"><div class="dash-pt">门店数据趋势列表（' + dashDateStart + '~' + dashDateEnd + '）</div>';
   h += '<div style="max-height:420px;overflow:auto"><table class="dash-tbl"><thead><tr>';
-  ['日期','门店','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','≥3min深沟通','平均接通时长','呼入量','呼入接通','呼入接通率','联系客户数','个微添数','企微添数','通话总时长','人均时长'].forEach(function(th) {
-    h += thHint(th, TREND_HINTS);
+  ['日期','门店','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通','平均接通时长','呼入量','呼入接通','呼入接通率','联系客户数','个微添数','企微添数','通话总时长','人均时长'].forEach(function(th) {
+    h += '<th>' + th + '</th>';
   });
   h += '</tr></thead><tbody>';
-  var tSums = { out:0, ret:0, newc:0, conn:0, over30:0, over30c:0, deep:0, durSum:0, durCnt:0, inC:0, inConn:0, phoneSet:new Set(), wx:0, qw:0, totalDur:0, empSet:new Set(), perCapSum:0, perCapCnt:0 };
+  var tSums = { out:0, ret:0, newc:0, conn:0, over30:0, over30c:0, deep:0, durSum:0, durCnt:0, inC:0, inConn:0, phoneSet:new Set(), wx:0, qw:0, totalDur:0, empSet:new Set() };
   storeDateList.forEach(function(sd) {
     var d = sd.d, st = sd.st;
     var dd = filteredRecs.filter(function(r) { return r.date === d && r.store === st; });
@@ -1943,7 +1645,6 @@ function overviewHTML() {
     tSums.inC += inC; tSums.inConn += inCconn;
     phones.forEach(function(p) { tSums.phoneSet.add(p); });
     tSums.wx += wxAdd; tSums.qw += qwAdd; tSums.totalDur += totalDur;
-    tSums.perCapSum += perCap; tSums.perCapCnt++;
     emps.forEach(function(e) { tSums.empSet.add(e); });
     h += '<tr><td>' + d + '</td><td>' + st + '</td><td>' + calls + '</td><td>' + ret + '</td><td>' + newc + '</td><td>' + conns + '</td><td>' + (rate*100).toFixed(1) + '%</td><td>' + over30 + '</td><td>' + (over30c*100).toFixed(1) + '%</td><td>' + deep + '</td><td>' + avgDur.toFixed(1) + '</td><td>' + inC + '</td><td>' + inCconn + '</td><td>' + (inRate*100).toFixed(1) + '%</td><td>' + phones.size + '</td><td>' + wxAdd + '</td><td>' + qwAdd + '</td><td>' + Math.round(totalDur) + '</td><td>' + perCap.toFixed(1) + '</td></tr>';
   });
@@ -1952,8 +1653,8 @@ function overviewHTML() {
   var tOver30Rate = tSums.over30c > 0 ? tSums.over30 / tSums.over30c : 0;
   var tAvgDur = tSums.durCnt > 0 ? tSums.durSum / tSums.durCnt : 0;
   var tInRate = tSums.inC > 0 ? tSums.inConn / tSums.inC : 0;
-  var tPerCap = tSums.perCapCnt > 0 ? tSums.perCapSum / tSums.perCapCnt : 0;
-  h += '<tr style="font-weight:bold;background:#e8f0fe"><td>合计</td><td></td><td>' + tSums.out + '</td><td>' + tSums.ret + '</td><td>' + tSums.newc + '</td><td>' + tSums.conn + '</td><td>' + (tRate*100).toFixed(1) + '%</td><td>' + tSums.over30 + '</td><td>' + (tOver30Rate*100).toFixed(1) + '%</td><td>' + tSums.deep + '</td><td>' + tAvgDur.toFixed(1) + '</td><td>' + tSums.inC + '</td><td>' + tSums.inConn + '</td><td>' + (tInRate*100).toFixed(1) + '%</td><td>' + tSums.phoneSet.size + '</td><td>' + tSums.wx + '</td><td>' + tSums.qw + '</td><td>' + Math.round(tSums.totalDur) + '</td><td>' + tPerCap.toFixed(1) + '</td></tr>';
+  var tPerCap = tSums.empSet.size > 0 ? tSums.totalDur / tSums.empSet.size : 0;
+  h += '<tr style="font-weight:bold;background:#e8f0fe"><td>合计</td><td>' + tSums.out + '</td><td>' + tSums.ret + '</td><td>' + tSums.newc + '</td><td>' + tSums.conn + '</td><td>' + (tRate*100).toFixed(1) + '%</td><td>' + tSums.over30 + '</td><td>' + (tOver30Rate*100).toFixed(1) + '%</td><td>' + tSums.deep + '</td><td>' + tAvgDur.toFixed(1) + '</td><td>' + tSums.inC + '</td><td>' + tSums.inConn + '</td><td>' + (tInRate*100).toFixed(1) + '%</td><td>' + tSums.phoneSet.size + '</td><td>' + tSums.wx + '</td><td>' + tSums.qw + '</td><td>' + Math.round(tSums.totalDur) + '</td><td>' + tPerCap.toFixed(1) + '</td></tr>';
   h += '</tbody></table></div></div>';
   return h;
 }
@@ -2007,7 +1708,7 @@ function drawAllCharts() {
   if (c = chartInit('ch-funnel')) c.setOption({
     tooltip: { trigger: 'item', backgroundColor: '#fff', borderColor: '#ddd', textStyle: { color: '#333' } },
     xAxis: { type: 'value', axisLabel: { color: '#888' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
-    yAxis: { type: 'category', data: ['加微好友', '≥3min深沟通', '≥30s有效通话', '成功接通', '外呼覆盖'], axisLabel: { fontSize: 12, color: '#333' } },
+    yAxis: { type: 'category', data: ['加微好友', '>3min深沟通', '≥30s有效通话', '成功接通', '外呼覆盖'], axisLabel: { fontSize: 12, color: '#333' } },
     series: [{ type: 'bar', data: [dayWechat, dayOver3min, dayOver30, dayOutConn, dayOutTotal].map(function(v, i) { return { value: v, itemStyle: { color: ['#13c2c2', '#4a9eff', '#52c41a', '#faad14', '#0f3460'][i], barBorderRadius: [0, 4, 4, 0] } }; }), barWidth: '45%', label: { show: true, position: 'right', color: '#333', fontSize: 12, fontWeight: 'bold', formatter: '{c}' } }]
   });
 
@@ -2073,8 +1774,6 @@ function drawAllCharts() {
 }
 
 // ── 人员分析 ──
-let personnelMode = 'day';
-
 function getDayActiveEmps() {
   var dayRecs = filterByStore(D.callRecords.filter(function(r) { return r.date === D.reportDateStr; }));
   var dayWx = filterByStore(D.wxRecords.filter(function(r) { return r.date === D.reportDateStr; }));
@@ -2118,88 +1817,23 @@ function getDayActiveEmps() {
   }).sort(function(a, b) { return b.outCalls - a.outCalls; });
 }
 
-function getRangeActiveEmps(ds, de) {
-  var recs = filterByStore(D.callRecords.filter(function(r) { return r.date >= ds && r.date <= de; }));
-  var wxRecs = filterByStore(D.wxRecords.filter(function(r) { return r.date && r.date >= ds && r.date <= de; }));
-  var qwRecs = filterByStore(D.qwRecords.filter(function(r) { return r.date && r.date >= ds && r.date <= de; }));
-  var empSet = new Set();
-  recs.forEach(function(r) { empSet.add(r.emp); });
-  wxRecs.forEach(function(r) { empSet.add(r.emp); });
-  qwRecs.forEach(function(r) { empSet.add(r.emp); });
-  var emps = Array.from(empSet);
-  return emps.map(function(emp) {
-    var out = recs.filter(function(r) { return r.emp === emp && r.outbound; });
-    var inc = recs.filter(function(r) { return r.emp === emp && !r.outbound; });
-    var outCalls = out.length;
-    var outConn = out.filter(function(r) { return r.conn; }).length;
-    var outRate = outCalls > 0 ? outConn / outCalls : 0;
-    var outDur = out.filter(function(r) { return r.conn; }).reduce(function(s, r) { return s + r.durSec; }, 0) / 60;
-    var outOver30 = out.filter(function(r) { return r.over30s; }).length;
-    var outOver30Rate = outConn > 0 ? outOver30 / outConn : 0;
-    var outOver3min = out.filter(function(r) { return r.over3min; }).length;
-    var outReturn = out.filter(function(r) { return r.isReturning; }).length;
-    var outNew = out.filter(function(r) { return r.isNewCustomer; }).length;
-    var outAvgDur = outConn > 0 ? outDur / outConn : 0;
-    var uniquePhones = new Set(out.map(function(r) { return r.phone; }).filter(function(p) { return p && p !== '--'; })).size;
-    var inCalls = inc.length;
-    var inConn = inc.filter(function(r) { return r.conn; }).length;
-    var inRate = inCalls > 0 ? inConn / inCalls : 0;
-    var inDur = inc.filter(function(r) { return r.conn; }).reduce(function(s, r) { return s + r.durSec; }, 0) / 60;
-    var totalDur = (out.filter(function(r) { return r.conn; }).reduce(function(s, r) { return s + r.durSec; }, 0) +
-      inc.filter(function(r) { return r.conn; }).reduce(function(s, r) { return s + r.durSec; }, 0)) / 60;
-    var qwAdd = qwRecs.filter(function(r) { return r.emp === emp; }).length;
-    var wxAdd = wxRecs.filter(function(r) { return r.emp === emp; }).length;
-    var qwTotal = filterByStore(D.qwRecords.filter(function(r) { return r.emp === emp; })).length;
-    var wxTotal = filterByStore(D.wxRecords.filter(function(r) { return r.emp === emp; })).length;
-    var store = (recs.find(function(r) { return r.emp === emp; }) || {}).store || '--';
-    return { emp: emp, store: store, outCalls: outCalls, outReturn: outReturn, outNew: outNew, outConn: outConn, outRate: outRate,
-      outOver30: outOver30, outOver30Rate: outOver30Rate, outOver3min: outOver3min,
-      outAvgDur: outAvgDur, uniquePhones: uniquePhones,
-      inCalls: inCalls, inConn: inConn, inRate: inRate,
-      wxTotal: wxTotal, wxAdd: wxAdd, qwTotal: qwTotal, qwAdd: qwAdd,
-      outDur: outDur, inDur: inDur, totalDur: totalDur };
-  }).sort(function(a, b) { return b.outCalls - a.outCalls; });
-}
-
 function personnelHTML() {
-  var isDay = personnelMode === 'day';
-  var h = '';
-
-  // 切换按钮
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('数据模式');
-  h += '<div style="display:flex;gap:8px;margin-bottom:8px">';
-  h += '<button class="dash-btn' + (isDay ? '' : ' dash-btn-o') + '" onclick="switchPersonnelMode(\'day\')" style="' + (isDay ? '' : 'background:#fff;color:#0f3460;border:1.5px solid #ddd;') + '">日报</button>';
-  h += '<button class="dash-btn' + (!isDay ? '' : ' dash-btn-o') + '" onclick="switchPersonnelMode(\'range\')" style="' + (!isDay ? '' : 'background:#fff;color:#0f3460;border:1.5px solid #ddd;') + '">按时间范围选择</button>';
-  h += '</div>';
-
-  if (!isDay) {
-    h += '<div class="dash-date-row"><span class="dash-date-label">起始</span><input type="date" class="dash-date-input" id="prDs" value="' + dashDateStart + '" onchange="onPersonnelRangeChange()">';
-    h += '<span class="sep">至</span><span class="dash-date-label">结束</span><input type="date" class="dash-date-input" id="prDe" value="' + dashDateEnd + '" onchange="onPersonnelRangeChange()">';
-    h += '<span style="font-size:11px;color:#999">（最大60天）</span></div>';
-    var ds = document.getElementById('prDs') ? document.getElementById('prDs').value : dashDateStart;
-    var de = document.getElementById('prDe') ? document.getElementById('prDe').value : dashDateEnd;
-  }
-  h += '</div>';
-
-  var label = isDay ? D.reportDateStr : (ds + '~' + de);
-  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt"><span class="hint-wrap">人员外呼情况' + ptHintSpan('人员外呼情况') + '</span>（' + label + '）</div><div class="dash-ch" id="ch-emp-out"></div></div>';
-  h += '<div class="dash-r2" style="margin-bottom:12px"><div class="dash-pn">' + ptHint('外呼接通时长（分钟）') + '<div class="dash-ch" id="ch-emp-dur"></div></div>';
-  h += '<div class="dash-pn">' + ptHint('≥30s有效外呼') + '<div class="dash-ch" id="ch-emp-over30"></div></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('人员呼入接通情况') + '<div class="dash-ch" id="ch-emp-in"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('人员加微情况') + '<div class="dash-ch" id="ch-emp-wechat"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('通话总时长（分钟）') + '<div class="dash-ch" id="ch-emp-totaldur"></div></div>';
+  var h = '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">人员外呼情况（' + D.reportDateStr + '）</div><div class="dash-ch" id="ch-emp-out"></div></div>';
+  h += '<div class="dash-r2" style="margin-bottom:12px"><div class="dash-pn"><div class="dash-pt">外呼接通时长（分钟）</div><div class="dash-ch" id="ch-emp-dur"></div></div>';
+  h += '<div class="dash-pn"><div class="dash-pt">≥30s有效外呼</div><div class="dash-ch" id="ch-emp-over30"></div></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">人员呼入接通情况</div><div class="dash-ch" id="ch-emp-in"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">人员加微情况</div><div class="dash-ch" id="ch-emp-wechat"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">通话总时长（分钟）</div><div class="dash-ch" id="ch-emp-totaldur"></div></div>';
 
   // 人员运营效能总览表
-  var emps = isDay ? getDayActiveEmps() : getRangeActiveEmps(ds, de);
-  h += '<div class="dash-pn"><div class="dash-pt"><span class="hint-wrap">人员运营效能总览' + ptHintSpan('人员运营效能总览') + '</span>（' + label + '）</div>';
+  var emps = getDayActiveEmps();
+  h += '<div class="dash-pn"><div class="dash-pt">人员运营效能总览（' + D.reportDateStr + '）</div>';
   h += '<div style="max-height:420px;overflow:auto"><table class="dash-tbl"><thead><tr>';
-  ['员工','门店','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','≥3min深沟通',
+  ['员工','门店','外呼量','老客跟进','新客外呼','接通量','接通率','≥30s通话','≥30s通话率','>3min深沟通',
    '呼入量','呼入接通','呼入接通率','联系客户数','个微好友','当日个微','企微好友','当日企微','平均接通时长','通话总时长'].forEach(function(th) {
-    h += thHint(th, PERSONNEL_HINTS);
+    h += '<th>' + th + '</th>';
   });
   h += '</tr></thead><tbody>';
-  var sums = { outCalls:0, outReturn:0, outNew:0, outConn:0, outOver30:0, outOver30c:0, outOver3min:0, outDur:0, outDurCnt:0, outAvgDurSum:0, outAvgDurCnt:0,
-    inCalls:0, inConn:0, uniquePhonesSum:0, wxTotal:0, wxAdd:0, qwTotal:0, qwAdd:0, totalDur:0 };
   emps.forEach(function(e) {
     var vals = [e.emp, e.store, e.outCalls, e.outReturn, e.outNew, e.outConn, (e.outRate*100).toFixed(1)+'%',
       e.outOver30, (e.outOver30Rate*100).toFixed(1)+'%', e.outOver3min,
@@ -2208,59 +1842,13 @@ function personnelHTML() {
     h += '<tr>';
     vals.forEach(function(v) { h += '<td>' + v + '</td>'; });
     h += '</tr>';
-    sums.outCalls += e.outCalls; sums.outReturn += e.outReturn; sums.outNew += e.outNew;
-    sums.outConn += e.outConn; sums.outOver30 += e.outOver30; sums.outOver30c += e.outConn;
-    sums.outOver3min += e.outOver3min; sums.outDur += e.outDur * e.outConn; sums.outDurCnt += e.outConn;
-    sums.outAvgDurSum += e.outAvgDur; sums.outAvgDurCnt++;
-    sums.inCalls += e.inCalls; sums.inConn += e.inConn;
-    sums.wxTotal += e.wxTotal; sums.wxAdd += e.wxAdd; sums.qwTotal += e.qwTotal; sums.qwAdd += e.qwAdd;
-    sums.uniquePhonesSum += e.uniquePhones;
-    sums.totalDur += e.totalDur;
   });
-  // 合计行（日报和时间范围均显示）
-  var tRate = sums.outCalls > 0 ? sums.outConn / sums.outCalls : 0;
-  var tOver30Rate = sums.outOver30c > 0 ? sums.outOver30 / sums.outOver30c : 0;
-  var tAvgDur = sums.outAvgDurCnt > 0 ? sums.outAvgDurSum / sums.outAvgDurCnt : 0;
-  var tInRate = sums.inCalls > 0 ? sums.inConn / sums.inCalls : 0;
-  h += '<tr style="font-weight:bold;background:#e8f0fe"><td>合计</td><td></td>';
-  [sums.outCalls, sums.outReturn, sums.outNew, sums.outConn, (tRate*100).toFixed(1)+'%',
-   sums.outOver30, (tOver30Rate*100).toFixed(1)+'%', sums.outOver3min,
-   sums.inCalls, sums.inConn, (tInRate*100).toFixed(1)+'%', sums.uniquePhonesSum,
-   sums.wxTotal, sums.wxAdd, sums.qwTotal, sums.qwAdd, tAvgDur.toFixed(1), Math.round(sums.totalDur)].forEach(function(v) {
-    h += '<td>' + v + '</td>';
-  });
-  h += '</tr>';
   h += '</tbody></table></div></div>';
   return h;
 }
 
-function switchPersonnelMode(mode) {
-  personnelMode = mode;
-  renderDashboard();
-}
-
-function onPersonnelRangeChange() {
-  var s = document.getElementById('prDs').value;
-  var e = document.getElementById('prDe').value;
-  if (!s || !e) return;
-  var days = (new Date(e) - new Date(s)) / 86400000;
-  if (days > 60) { alert('日期范围最大60天'); return; }
-  if (days < 0) { alert('结束日期不能早于开始日期'); return; }
-  drawPersonnel();
-}
-
 function drawPersonnel() {
-  var isDay = personnelMode === 'day';
-  var emps;
-  if (isDay) {
-    emps = getDayActiveEmps();
-  } else {
-    var ds = document.getElementById('prDs') ? document.getElementById('prDs').value : dashDateStart;
-    var de = document.getElementById('prDe') ? document.getElementById('prDe').value : dashDateEnd;
-    if (!ds || !de) { ds = dashDateStart; de = dashDateEnd; }
-    emps = getRangeActiveEmps(ds, de);
-  }
-  var c;
+  var c, emps = getDayActiveEmps();
   var empNames = emps.map(function(e) { return e.emp.length > 6 ? e.emp.slice(0, 6) + '...' : e.emp; });
 
   // 1. 人员外呼情况: 外呼量柱 + 接通率折线
@@ -2337,7 +1925,7 @@ function getEmpTrendEmps() {
 function empTrendHTML() {
   var allEmps = getEmpTrendEmps();
   if (empTrendSel.length === 0) empTrendSel = allEmps.slice();
-  var h = '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('筛选条件');
+  var h = '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">筛选条件</div>';
   h += '<div class="dash-date-row"><span class="dash-date-label">起始</span><input type="date" class="dash-date-input" id="etDs" value="' + dashDateStart + '" onchange="onEmpTrendChange()">';
   h += '<span class="sep">至</span><span class="dash-date-label">结束</span><input type="date" class="dash-date-input" id="etDe" value="' + D.fullEnd + '" onchange="onEmpTrendChange()">';
   h += '<span style="font-size:11px;color:#999;margin-left:8px">（最大60天）</span></div>';
@@ -2349,12 +1937,12 @@ function empTrendHTML() {
   });
   h += '</div></div>';
 
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('外呼量趋势') + '<div class="dash-ch-l" id="ch-et-out"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('外呼接通率趋势') + '<div class="dash-ch-l" id="ch-et-rate"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('外呼接通时长趋势（分钟）') + '<div class="dash-ch-l" id="ch-et-dur"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('≥30s有效外呼趋势') + '<div class="dash-ch-l" id="ch-et-over30"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('人员加微情况趋势') + '<div class="dash-ch-l" id="ch-et-wechat"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('通话总时长趋势（分钟）') + '<div class="dash-ch-l" id="ch-et-totaldur"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">外呼量趋势</div><div class="dash-ch-l" id="ch-et-out"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">外呼接通率趋势</div><div class="dash-ch-l" id="ch-et-rate"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">外呼接通时长趋势（分钟）</div><div class="dash-ch-l" id="ch-et-dur"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">≥30s有效外呼趋势</div><div class="dash-ch-l" id="ch-et-over30"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">人员加微情况趋势</div><div class="dash-ch-l" id="ch-et-wechat"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">通话总时长趋势（分钟）</div><div class="dash-ch-l" id="ch-et-totaldur"></div></div>';
   return h;
 }
 
@@ -2454,7 +2042,7 @@ function drawEmpTrend() {
     tooltip: Tt, legend: legT, grid: gridL,
     xAxis: { type: 'category', data: allDates, axisLabel: { fontSize: 10, color: '#888', rotate: 30 } },
     yAxis: { type: 'value', axisLabel: { color: '#888', fontSize: 10, formatter: '{value}%' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
-    series: (function() { var s = makeSeries('rate', 1); s.forEach(function(x) { x.data = x.data.map(function(v) { return v !== null ? Number((v * 100).toFixed(1)) : null; }); }); return s; })()
+    series: makeSeries('rate', 1)
   });
 
   if (c = chartInit('ch-et-dur')) c.setOption({
@@ -2496,16 +2084,16 @@ function drawEmpTrend() {
 // ── 全部门店趋势概览 ──
 function storeOverviewHTML() {
   if (soStoreFilter.length === 0) soStoreFilter = D.visibleStores.slice();
-  var h = '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('筛选条件');
+  var h = '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">筛选条件</div>';
   h += '<div class="dash-date-row"><span class="dash-date-label">起始</span><input type="date" class="dash-date-input" id="soDs" value="' + dashDateStart + '" onchange="onStoreOverviewChange()">';
   h += '<span class="sep">至</span><span class="dash-date-label">结束</span><input type="date" class="dash-date-input" id="soDe" value="' + D.fullEnd + '" onchange="onStoreOverviewChange()">';
   h += '<span style="font-size:11px;color:#999">（最大60天，默认近60天）</span></div></div>';
 
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('门店外呼趋势') + '<div class="dash-ch-l" id="ch-so-out"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('门店接通率趋势') + '<div class="dash-ch-l" id="ch-so-rate"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('企/个微新增量趋势') + '<div class="dash-ch-l" id="ch-so-wechat"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('≥30秒通话趋势') + '<div class="dash-ch-l" id="ch-so-over30"></div></div>';
-  h += '<div class="dash-pn" style="margin-bottom:12px">' + ptHint('平均外呼接通时长趋势') + '<div class="dash-ch-l" id="ch-so-avgdur"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">门店外呼趋势</div><div class="dash-ch-l" id="ch-so-out"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">门店外呼率趋势</div><div class="dash-ch-l" id="ch-so-rate"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">企/个微新增量趋势</div><div class="dash-ch-l" id="ch-so-wechat"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">≥30秒通话趋势</div><div class="dash-ch-l" id="ch-so-over30"></div></div>';
+  h += '<div class="dash-pn" style="margin-bottom:12px"><div class="dash-pt">平均外呼接通时长趋势</div><div class="dash-ch-l" id="ch-so-avgdur"></div></div>';
   return h;
 }
 
@@ -2595,7 +2183,7 @@ function drawStoreOverview() {
     tooltip: Tt, legend: soLeg, grid: soGrid,
     xAxis: { type: 'category', data: allDates, axisLabel: { fontSize: 10, color: '#888', rotate: 30 } },
     yAxis: { type: 'value', axisLabel: { color: '#888', fontSize: 10, formatter: '{value}%' }, splitLine: { lineStyle: { color: '#f0f0f0' } } },
-    series: (function() { var s = makeSSeries('rate', 1); s.forEach(function(x) { x.data = x.data.map(function(v) { return v !== null ? Number((v * 100).toFixed(1)) : null; }); }); return s; })()
+    series: makeSSeries('rate', 1)
   });
 
   if (c = chartInit('ch-so-wechat')) c.setOption({
