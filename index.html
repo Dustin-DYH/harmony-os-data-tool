@@ -1380,12 +1380,11 @@ async function generate() {
   const trendOutAvgDur = trendTotalOutConn > 0 ? Math.round(trendTotalOutDur / trendTotalOutConn * 10) / 10 : 0;
   const trendWxTotal = trendWx.length;
   const trendQwTotal = trendQw.length;
-  const trendTotalNewCust = trendCallRecords.filter(function(r) { return r.outbound && r.isNewCustomer; }).length;
 
   const ws3 = wb.addWorksheet('分店数据概览');
-  ws3.mergeCells('A1:L1');
+  ws3.mergeCells('A1:K1');
   ws3.getCell('A1').value = `${brand}分店数据概览`; ws3.getCell('A1').font = titleFont;
-  ws3.mergeCells('A2:L2');
+  ws3.mergeCells('A2:K2');
   ws3.getCell('A2').value = `${trendStart}~${trendEnd}（${tDays}天）| ${visibleStores.length}门店·${allEmps.length}员工 | 生成: ${todayStr}`;
   ws3.getCell('A2').font = smallFont;
 
@@ -1415,7 +1414,7 @@ async function generate() {
   row = 8;
   ws3.getCell(`A${row}`).value = '门店运营效能总览'; ws3.getCell(`A${row}`).font = subFont;
   row = 9;
-  setHdr(ws3.getRow(row), ['门店','外呼量','接通量','接通率','日均外呼','活跃员工','人均外呼','工作手机通话总时长（分钟）','平均外呼接通时长','企微加微','个微加微','新客占比']);
+  setHdr(ws3.getRow(row), ['门店','外呼量','接通量','接通率','日均外呼','活跃员工','人均外呼','工作手机通话总时长（分钟）','平均外呼接通时长','企微加微','个微加微']);
   const r3Start = row + 1;
   visibleStores.forEach(st => {
     row++;
@@ -1431,17 +1430,15 @@ async function generate() {
     const outAvgDur = conns > 0 ? Math.round(outDur/conns*10)/10 : 0;
     const qwCount = trendQw.filter(r=>r.store===st).length;
     const wxCount = trendWx.filter(r=>r.store===st).length;
-    const newRatio = calls>0?out.filter(r=>r.isNewCustomer).length/calls:0;
-    [st, calls, conns, Math.round(rate*1e4)/1e4, Math.round(daily), emps, perCapOut, Math.round(dur), outAvgDur, qwCount, wxCount, Math.round(newRatio*1e4)/1e4].forEach((v,i)=>{
-      setBodyCell(ws3.getRow(row).getCell(i+1), v, bodyFont, null, [3,11].includes(i)?pctFmt:null);
+    [st, calls, conns, Math.round(rate*1e4)/1e4, Math.round(daily), emps, perCapOut, Math.round(dur), outAvgDur, qwCount, wxCount].forEach((v,i)=>{
+      setBodyCell(ws3.getRow(row).getCell(i+1), v, bodyFont, null, [3].includes(i)?pctFmt:null);
     });
   });
   row++;
-  const trendTotalNewRatio = trendTotalOut>0?trendTotalNewCust/trendTotalOut:0;
-  ['合计', trendTotalOut, trendTotalOutConn, Math.round(trendTotalOutRate*1e4)/1e4, Math.round(trendAvgDaily), trendCallEmps, trendPerCapOut, Math.round(trendTotalOutDur), trendOutAvgDur, trendQwTotal, trendWxTotal, Math.round(trendTotalNewRatio*1e4)/1e4].forEach((v,i)=>{
-    setBodyCell(ws3.getRow(row).getCell(i+1), v, {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}}, altFill, [3,11].includes(i)?pctFmt:null);
+  ['合计', trendTotalOut, trendTotalOutConn, Math.round(trendTotalOutRate*1e4)/1e4, Math.round(trendAvgDaily), trendCallEmps, trendPerCapOut, Math.round(trendTotalOutDur), trendOutAvgDur, trendQwTotal, trendWxTotal].forEach((v,i)=>{
+    setBodyCell(ws3.getRow(row).getCell(i+1), v, {name:'Microsoft YaHei',size:10,bold:true,color:{argb:'333333'}}, altFill, [3].includes(i)?pctFmt:null);
   });
-  altRow(ws3, r3Start, row-1, 12);
+  altRow(ws3, r3Start, row-1, 11);
 
   row += 2;
   ws3.getCell(`A${row}`).value = '系统采纳指标'; ws3.getCell(`A${row}`).font = subFont;
@@ -1464,7 +1461,7 @@ async function generate() {
   });
   altRow(ws3, r3sStart, row, 3);
   ws3.views = [{state:'frozen', ySplit:7}];
-  ws3.columns = [18,13,13,13,13,13,13,13,13,13,13,13].map(w => ({width:w}));
+  ws3.columns = [18,13,13,13,13,13,13,13,13,13,13].map(w => ({width:w}));
   updateProgress(84);
 
   // =================== Sheet 5: 员工活跃度 ===================
