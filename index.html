@@ -1510,8 +1510,8 @@ async function generate() {
 
   row = 5;
   empStats.forEach(e => {
-    [e.emp, e.store, e.qwFriends, e.wxFriends, e.calls, e.conns, Math.round(e.rate*1e4)/1e4, Math.round(e.score*100)/100, e.sysType, e.stars].forEach((v,j)=>{
-      setBodyCell(ws5.getRow(row).getCell(j+1), v, bodyFont, e.score>=0.5?goodFill:null, j===6?pctFmt:(j===7?scoreFmt:null));
+    [e.emp, e.store, e.calls, e.conns, Math.round(e.rate*1e4)/1e4, Math.round(e.score*100)/100, e.sysType, e.stars].forEach((v,j)=>{
+      setBodyCell(ws5.getRow(row).getCell(j+1), v, bodyFont, e.score>=0.5?goodFill:null, j===4?pctFmt:(j===5?scoreFmt:null));
     });
     row++;
   });
