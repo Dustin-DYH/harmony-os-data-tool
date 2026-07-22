@@ -1467,7 +1467,7 @@ async function generate() {
   // =================== Sheet 5: 员工活跃度 ===================
   const ws5 = wb.addWorksheet('员工活跃度分析');
   ws5.getCell('A1').value = '员工活跃度分析'; ws5.getCell('A1').font = titleFont;
-  setHdr(ws5.getRow(4), ['员工','门店','外呼量','接通量','接通率','活跃度','主打系统','评级']);
+  setHdr(ws5.getRow(4), ['员工','门店','外呼量','接通量','接通率','活跃度','企微加微','个微加微','评级']);
 
   const empStats = callEmps.map(emp => {
     const ed = callRecords.filter(r => r.emp === emp && r.outbound && r.date >= trendStart && r.date <= trendEnd);
@@ -1479,17 +1479,13 @@ async function generate() {
     const allPhones = [...new Set(ed.map(r=>r.phone).filter(p=>p&&p!=='--'))];
     const connPhones = [...new Set(ed.filter(r=>r.conn).map(r=>r.phone).filter(p=>p&&p!=='--'))];
     const custRate = allPhones.length>0?connPhones.length/allPhones.length:0;
-    let sysType = '';
-    if (calls>0 && (qwFriends>0||wxFriends>0)) sysType = '双系统并重';
-    else if (calls>0) sysType = '通话覆盖';
-    else sysType = '企微获客';
-    return {emp, store, qwFriends, wxFriends, calls, conns, rate, custRate, sysType};
+    return {emp, store, qwFriends, wxFriends, calls, conns, rate, custRate};
   });
   // 仅微信/企微员工
   [...new Set([...wxEmps, ...qwEmps])].filter(e=>!callEmps.includes(e)).forEach(emp => {
     const qwFriends = qwRecords.filter(r=>r.emp===emp).length;
     const wxFriends = wxRecords.filter(r=>r.emp===emp).length;
-    empStats.push({emp, store:(wxRecords.find(r=>r.emp===emp)||qwRecords.find(r=>r.emp===emp)||{}).store||'未知', qwFriends, wxFriends, calls:0, conns:0, rate:0, custRate:0, sysType:'企微获客'});
+    empStats.push({emp, store:(wxRecords.find(r=>r.emp===emp)||qwRecords.find(r=>r.emp===emp)||{}).store||'未知', qwFriends, wxFriends, calls:0, conns:0, rate:0, custRate:0});
   });
 
   const maxCalls = Math.max(...empStats.map(e=>e.calls), 1);
@@ -1507,7 +1503,7 @@ async function generate() {
 
   row = 5;
   empStats.forEach(e => {
-    [e.emp, e.store, e.calls, e.conns, Math.round(e.rate*1e4)/1e4, Math.round(e.score*100)/100, e.sysType, e.stars].forEach((v,j)=>{
+    [e.emp, e.store, e.calls, e.conns, Math.round(e.rate*1e4)/1e4, Math.round(e.score*100)/100, e.qwFriends, e.wxFriends, e.stars].forEach((v,j)=>{
       setBodyCell(ws5.getRow(row).getCell(j+1), v, bodyFont, e.score>=0.5?goodFill:null, j===4?pctFmt:(j===5?scoreFmt:null));
     });
     row++;
